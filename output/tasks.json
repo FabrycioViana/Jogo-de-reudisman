@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Allegro",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "gcc main.c -o main $(pkg-config --cflags --libs allegro-5 allegro_image-5)"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    }
+  ]
+}
