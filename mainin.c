@@ -14,16 +14,12 @@
     - Renderização de sprites
 ===============================================================================
 */
-
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 #include <stdbool.h>
 
 int main() {
-
-    printf("Iniciando jogo...\n");
 
     al_init();
     al_init_image_addon();
@@ -32,14 +28,24 @@ int main() {
     int screenW = 1920;
     int screenH = 1080;
 
-    ALLEGRO_DISPLAY *display = al_create_display(screenW, screenH);
-    ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
-    ALLEGRO_TIMER *timer = al_create_timer(1.0 / 60.0);
+    ALLEGRO_DISPLAY *display =
+        al_create_display(screenW, screenH);
 
-    ALLEGRO_BITMAP *background = al_load_bitmap("background1.png");
-    ALLEGRO_BITMAP *player = al_load_bitmap("player.png");
+    ALLEGRO_EVENT_QUEUE *queue =
+        al_create_event_queue();
+
+    ALLEGRO_TIMER *timer =
+        al_create_timer(1.0 / 60.0);
+
+    // IMAGENS
+    ALLEGRO_BITMAP *background =
+        al_load_bitmap("background1.png");
+
+    ALLEGRO_BITMAP *player =
+        al_load_bitmap("player3.png");
 
     if (!background || !player) {
+
         printf("Erro ao carregar imagens!\n");
         return -1;
     }
@@ -53,20 +59,34 @@ int main() {
     bool running = true;
     bool redraw = false;
 
-    float x = 100;
-    float y = 300;
-
-    float speed = 3.0;
-
     bool keys[ALLEGRO_KEY_MAX] = {false};
 
-    int playerW = al_get_bitmap_width(player);
-    int playerH = al_get_bitmap_height(player);
+    // PLAYER
+    float x = 100;
+    float y = 400;
+    float speed = 5.0;
+
+    int direction = 1;
+
+    // SPRITESHEET 2x2
+    int sheetW = al_get_bitmap_width(player);
+    int sheetH = al_get_bitmap_height(player);
+
+    int columns = 2;
+    int rows = 2;
+
+    int frameW = sheetW / columns;
+    int frameH = sheetH / rows;
+
+    int currentFrame = 0;
+    int frameTimer = 0;
+    int frameDelay = 10;
+    int maxFrames = 4;
+
+    float scale = 3.0;
 
     int bgW = al_get_bitmap_width(background);
     int bgH = al_get_bitmap_height(background);
-
-    printf("Entrando no loop do jogo...\n");
 
     while (running) {
 
@@ -79,45 +99,47 @@ int main() {
                 running = false;
                 break;
 
-            case ALLEGRO_EVENT_TIMER:
+            case ALLEGRO_EVENT_TIMER: {
 
-                // MOVIMENTO HORIZONTAL
-                if (keys[ALLEGRO_KEY_RIGHT] || keys[ALLEGRO_KEY_D])
+                bool moving = false;
+
+                if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT]) {
                     x += speed;
+                    direction = 1;
+                    moving = true;
+                }
 
-                if (keys[ALLEGRO_KEY_LEFT] || keys[ALLEGRO_KEY_A])
+                if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT]) {
                     x -= speed;
+                    direction = -1;
+                    moving = true;
+                }
 
-                // MOVIMENTO VERTICAL
-                if (keys[ALLEGRO_KEY_UP] || keys[ALLEGRO_KEY_W])
-                    y -= speed;
+                if (x < 0) x = 0;
+                if (x > screenW - (frameW * scale))
+                    x = screenW - (frameW * scale);
 
-                if (keys[ALLEGRO_KEY_DOWN] || keys[ALLEGRO_KEY_S])
-                    y += speed;
+                if (moving) {
 
-                // LIMITES VERTICAIS
+                    frameTimer++;
 
-                // Impede o player de subir demais
-                if (y < 200)
-                    y = 200;
+                    if (frameTimer >= frameDelay) {
 
-                // Impede sair da parte inferior da tela
-                if (y > screenH - playerH)
-                    y = screenH - playerH;
+                        frameTimer = 0;
 
+                        currentFrame++;
 
-                // LIMITES HORIZONTAIS
+                        if (currentFrame >= maxFrames)
+                            currentFrame = 0;
+                    }
 
-                // Impede sair pela esquerda
-                if (x < 0)
-                    x = 0;
-
-                // Impede sair pela direita
-                if (x > screenW - playerW)
-                    x = screenW - playerW;
+                } else {
+                    currentFrame = 0;
+                }
 
                 redraw = true;
                 break;
+            }
 
             case ALLEGRO_EVENT_KEY_DOWN:
                 keys[event.keyboard.keycode] = true;
@@ -134,30 +156,59 @@ int main() {
 
             al_clear_to_color(al_map_rgb(0, 0, 0));
 
-            float scale = (float)screenH / bgH;
-            int drawW = screenW;
-            int drawH = screenH;
-
+            // BACKGROUND
             al_draw_scaled_bitmap(
                 background,
                 0, 0,
                 bgW, bgH,
                 0, 0,
-                drawW,
-                drawH,
+                screenW, screenH,
                 0
             );
 
-            al_draw_bitmap(player, x, y, 0);
+            // FRAME
+            int frameX = (currentFrame % columns) * frameW;
+            int frameY = (currentFrame / columns) * frameH;
+
+            // CENTRO DO FRAME
+            float centerX = frameW / 2.0;
+            float centerY = frameH / 2.0;
+
+            float scaleX = scale;
+            if (direction == -1)
+                scaleX = -scale;
+
+            al_draw_tinted_scaled_rotated_bitmap_region(
+
+                player,
+
+                frameX,
+                frameY,
+                frameW,
+                frameH,
+
+                al_map_rgb(255, 255, 255),
+
+                centerX,
+                centerY,
+
+                x + (frameW * scale) / 2,
+                y + (frameH * scale) / 2,
+
+                scaleX,
+                scale,
+
+                0,
+                0
+            );
 
             al_flip_display();
         }
     }
 
-    printf("Finalizando...\n");
-
     al_destroy_bitmap(background);
     al_destroy_bitmap(player);
+
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     al_destroy_display(display);
