@@ -1,0 +1,1 @@
+gcc mainin.c -o jogo.exe $(pkg-config --libs --cflags allegro_main-5 allegro-5 allegro_image-5 allegro_primitives-5)
