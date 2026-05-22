@@ -98,8 +98,6 @@ NOTAS
 
 -------------------------------------------------------------------------------
 */
-
-
 #include "mapa.h"
 #include "colisao.h"
 
@@ -112,6 +110,7 @@ NOTAS
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h> 
+#include <stdlib.h>
 
 #define STATE_MENU 0
 #define STATE_GAME 1
@@ -119,7 +118,7 @@ NOTAS
 #define MAX_DIALOGUES 10
 
 typedef struct {
-    const char *lines[MAX_DIALOGUES];
+    char *lines[MAX_DIALOGUES];
     int count;
     int current;
     bool active;
@@ -132,11 +131,47 @@ typedef struct {
 } Dialogue;
 
 void addDialogue(Dialogue *d, const char *text) {
-    if (d->count >= MAX_DIALOGUES) return;
-    d->lines[d->count++] = text;
+
+    if (d->count >= MAX_DIALOGUES)
+        return;
+
+    char *copy = malloc(strlen(text) + 1);
+
+    if (!copy)
+        return;
+
+    strcpy(copy, text);
+
+    d->lines[d->count++] = copy;
 }
 
+void loadDialoguesFromFile(Dialogue *d, const char *filename) {
+
+    FILE *file = fopen(filename, "r");
+
+    if (!file) {
+        perror("fopen falhou");
+        printf("Arquivo tentado: %s\n", filename);
+        return;
+    }
+
+    char buffer[256];
+
+    while (fgets(buffer, sizeof(buffer), file)) {
+
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        if (strlen(buffer) > 0)
+            addDialogue(d, buffer);
+    }
+
+    fclose(file);
+}
 void startDialogue(Dialogue *d) {
+
+    if (d->count <= 0)
+        return;
+
     d->current = 0;
     d->active = true;
 
@@ -146,6 +181,7 @@ void startDialogue(Dialogue *d) {
 }
 
 void nextDialogue(Dialogue *d) {
+
     if (d->current < d->count - 1)
         d->current++;
     else
@@ -156,7 +192,16 @@ void nextDialogue(Dialogue *d) {
 }
 
 const char* getDialogue(Dialogue *d) {
-    if (!d->active) return "";
+
+    if (!d->active)
+        return "";
+
+    if (d->current < 0 || d->current >= d->count)
+        return "";
+
+    if (!d->lines[d->current])
+        return "";
+
     return d->lines[d->current];
 }
 
@@ -208,13 +253,15 @@ int main() {
     Dialogue dialogue = {0};
     dialogue.avatar = avatar;
 
-    addDialogue(&dialogue, "Eu... acordei aqui.");
-    addDialogue(&dialogue, "Que lugar é esse?");
-    addDialogue(&dialogue, "Não é meu campo de batalha...");
-    addDialogue(&dialogue, "Preciso entender o que aconteceu.");
+  loadDialoguesFromFile(&dialogue, "/home/fabz/Jogo-de-reudisman/falas.txt");
 
+printf("Dialogos carregados: %d\n", dialogue.count);
+
+if (dialogue.count > 0) {
     startDialogue(&dialogue);
-
+} else {
+    printf("Nenhum dialogo carregado!\n");
+}
    //Inputs
 
     al_register_event_source(queue, al_get_display_event_source(display));
@@ -294,29 +341,31 @@ int main() {
                         if (dialogue.typeTimer >= dialogue.typeSpeed) {
                             dialogue.typeTimer = 0;
 
-                            int len = strlen(dialogue.lines[dialogue.current]);
+                            const char *currentText = getDialogue(&dialogue);
+                                int len = strlen(currentText);
 
                             if (dialogue.charIndex < len)
                                 dialogue.charIndex++;
                         }
                     }
 
-                   //Ação de pular o dialogo
+    //Ação de pular o dialogo
 
-                    if (dialogue.active &&
-                        keys[ALLEGRO_KEY_ENTER] &&
-                        !enterPressed) {
+                  if (dialogue.active &&
+    keys[ALLEGRO_KEY_ENTER] &&
+    !enterPressed) {
 
-                        enterPressed = true;
+    enterPressed = true;
 
-                        int len = strlen(dialogue.lines[dialogue.current]);
+    const char *currentText = getDialogue(&dialogue);
+    int len = strlen(currentText);
 
-                        if (dialogue.charIndex < len) {
-                            dialogue.charIndex = len;
-                        } else {
-                            nextDialogue(&dialogue);
-                        }
-                    }
+    if (dialogue.charIndex < len) {
+        dialogue.charIndex = len;
+    } else {
+        nextDialogue(&dialogue);
+    }
+}
 
                    //Movimentação
 
@@ -434,7 +483,7 @@ int main() {
                 
                 if (dialogue.active) {
 
-                    const char *full = dialogue.lines[dialogue.current];
+                    const char *full = getDialogue(&dialogue);
 
                     char buffer[256];
                     int len = dialogue.charIndex;
@@ -494,5 +543,10 @@ int main() {
     al_destroy_event_queue(queue);
     al_destroy_display(display);
 
+    for (int i = 0; i < dialogue.count; i++) {
+
+    if (dialogue.lines[i])
+        free(dialogue.lines[i]);
+}
     return 0;
 }
