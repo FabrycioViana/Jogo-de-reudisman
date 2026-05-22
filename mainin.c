@@ -253,7 +253,7 @@ int main() {
     Dialogue dialogue = {0};
     dialogue.avatar = avatar;
 
-  loadDialoguesFromFile(&dialogue, "/home/fabz/Jogo-de-reudisman/falas.txt");
+  loadDialoguesFromFile(&dialogue, "falas.txt");
 
 printf("Dialogos carregados: %d\n", dialogue.count);
 
