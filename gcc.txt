@@ -1,1 +1,1 @@
-gcc mainin.c mapa.c colisao.c -o jogo.exe $(pkg-config --libs --cflags allegro-5 allegro_main-5 allegro_image-5 allegro_font-5 allegro_ttf-5 allegro_primitives-5)
+gcc mainin.c mapa.c colisao.c -o jogo.exe $(pkg-config --libs --cflags allegro-5 allegro_main-5 allegro_image-5 allegro_font-5 allegro_ttf-5 allegro_primitives-3)

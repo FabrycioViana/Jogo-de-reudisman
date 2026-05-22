@@ -267,7 +267,6 @@ if (dialogue.count > 0) {
     printf("Nenhum dialogo carregado!\n");
 }
    //Inputs
-
     al_register_event_source(queue, al_get_display_event_source(display));
     al_register_event_source(queue, al_get_timer_event_source(timer));
     al_register_event_source(queue, al_get_keyboard_event_source());
