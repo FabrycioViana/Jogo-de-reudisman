@@ -252,13 +252,7 @@ int main() {
     //Dialogos
     Dialogue dialogue = {0};
     dialogue.avatar = avatar;
-
-<<<<<<< HEAD
   loadDialoguesFromFile(&dialogue, "falas.txt");
-=======
-  loadDialoguesFromFile(&dialogue, "C:\Users\Daniel\OneDrive\Desktop\Jogo-de-reudisman\falas.txt");
->>>>>>> 225d2ee1e02c95d97eff66125a5e090893a554a1
-
 printf("Dialogos carregados: %d\n", dialogue.count);
 
 if (dialogue.count > 0) {
@@ -446,13 +440,13 @@ if (dialogue.count > 0) {
                     al_map_rgb(255,255,255),
                     screenW/2, 400,
                     ALLEGRO_ALIGN_CENTER,
-                    selected == 0 ? "> START" : "START");
+                    selected == 0 ? "> Começar" : "Começar");
 
                 al_draw_text(font,
                     al_map_rgb(255,255,255),
                     screenW/2, 450,
                     ALLEGRO_ALIGN_CENTER,
-                    selected == 1 ? "> EXIT" : "EXIT");
+                    selected == 1 ? "> Sair" : "Sair");
             }
 
             
