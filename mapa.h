@@ -19,4 +19,7 @@ void drawMap(Mapa *mapa);
 
 void destroyMap(Mapa *mapa);
 
+//busca linear para os mapas
+int buscarMapa(int mapaAtual, int total);
+
 #endif

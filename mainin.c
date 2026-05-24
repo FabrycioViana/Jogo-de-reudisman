@@ -225,12 +225,24 @@ int main() {
 
     al_start_timer(timer);
 
-    ///Mapa
-    Mapa mapa;
-    if (!initMap(&mapa, "background1.png")) {
-        printf("Erro ao carregar mapa!\n");
-        return -1;
-    }
+    ///Mapas
+    Mapa mapas[2];
+
+    int totalMapas = 2;
+
+    int mapaAtual = 0;
+
+    // Carrega mapa 1
+if (!initMap(&mapas[0], "background1.png")) {
+    printf("Erro ao carregar mapa 1!\n");
+    return -1;
+}
+
+// Carrega mapa 2
+if (!initMap(&mapas[1], "background2.png")) {
+    printf("Erro ao carregar mapa 2!\n");
+    return -1;
+}
 
     //Player
 
@@ -252,7 +264,11 @@ int main() {
     //Dialogos
     Dialogue dialogue = {0};
     dialogue.avatar = avatar;
+
   loadDialoguesFromFile(&dialogue, "falas.txt");
+
+  loadDialoguesFromFile(&dialogue, "falas.txt");
+
 printf("Dialogos carregados: %d\n", dialogue.count);
 
 if (dialogue.count > 0) {
@@ -275,7 +291,7 @@ if (dialogue.count > 0) {
     int selected = 0;
 
     float x = 100;
-    float y = 400;
+    float y = 600;
     float speed = 5.0;
     int direction = 1;
 
@@ -288,7 +304,7 @@ if (dialogue.count > 0) {
     int frameW = sheetW / columns;
     int frameH = sheetH / rows;
 
-    float scale = 2.0;
+    float scale = 1.5;
 
     Rect playerBox;
 
@@ -390,6 +406,16 @@ if (dialogue.count > 0) {
                     x = playerBox.x;
                     y = playerBox.y;
 
+                    if (
+                        x >= screenW &&
+                        mapaAtual < totalMapas - 1
+                        )
+                        {
+                            mapaAtual++;
+
+                            x = 50;
+                        }
+
                     if (moving) {
                         frameTimer++;
                         if (frameTimer >= frameDelay) {
@@ -454,7 +480,14 @@ if (dialogue.count > 0) {
             
             if (gameState == STATE_GAME) {
 
-                drawMap(&mapa);
+                drawMap(
+                    &mapas[
+                        buscarMapa(
+                        mapaAtual,
+                        totalMapas
+                        )
+                    ]
+                );
 
                 int frameX = (currentFrame % columns) * frameW;
                 int frameY = (currentFrame / columns) * frameH;
@@ -533,7 +566,16 @@ if (dialogue.count > 0) {
     
     // Limpeza
     al_destroy_font(font);
-    destroyMap(&mapa);
+
+    for (
+        int i = 0;
+        i < totalMapas;
+        i++
+            )
+        destroyMap(
+        &mapas[i]
+    );
+
     al_destroy_bitmap(player);
     al_destroy_bitmap(avatar);
     al_destroy_timer(timer);
