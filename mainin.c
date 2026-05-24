@@ -267,7 +267,6 @@ if (!initMap(&mapas[1], "background2.png")) {
 
   loadDialoguesFromFile(&dialogue, "falas.txt");
 
-  loadDialoguesFromFile(&dialogue, "falas.txt");
 
 printf("Dialogos carregados: %d\n", dialogue.count);
 
