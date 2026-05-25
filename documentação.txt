@@ -1,0 +1,99 @@
+
+Jogo de Reudisman
+-------------------------------------------------------------------------------
+
+Este projeto demonstra a construção de um jogo 2D utilizando a biblioteca Allegro 5.
+
+O código implementa um sistema base de engine simples com:
+
+-------------------------------------------------------------------------------
+FUNCIONALIDADES PRINCIPAIS
+-------------------------------------------------------------------------------
+
+Inicialização da biblioteca Allegro 5
+Criação de janela (display)
+Sistema de eventos (event queue)
+Timer para controle de FPS fixo (60 FPS)
+Captura de entrada via teclado
+Loop principal de jogo (game loop)
+
+-------------------------------------------------------------------------------
+GAMEPLAY
+-------------------------------------------------------------------------------
+
+Movimento do jogador com teclas A / D / Setas
+Direção do personagem (esquerda/direita)
+Animação por spritesheet (frames)
+Sistema básico de colisão com bordas da tela
+Estrutura de estado (Menu / Jogo)
+
+-------------------------------------------------------------------------------
+MAPA
+-------------------------------------------------------------------------------
+
+Renderização de mapa de fundo (tilemap ou imagem)
+Função externa initMap() para carregar o cenário
+Função drawMap() para renderização
+Função destroyMap() para limpeza de memória
+
+-------------------------------------------------------------------------------
+SISTEMA DE DIÁLOGO
+-------------------------------------------------------------------------------
+Sistema de diálogo estilo RPG
+Suporte a múltiplas falas (array de strings)
+Controle de estado de diálogo (ativo/inativo)
+Avanço de falas com tecla ENTER
+
+EFEITO TYPEWRITER (máquina de escrever):
+ Texto aparece letra por letra
+ Controle de velocidade de digitação
+    ENTER:
+       completa texto instantaneamente
+       ou avança para próxima fala
+
+Interface de diálogo:
+    Caixa semi-transparente na parte inferior
+    Avatar do personagem exibido ao lado do texto
+
+-------------------------------------------------------------------------------
+RENDERIZAÇÃO
+-------------------------------------------------------------------------------
+
+Renderização de sprites com al_draw_tinted_scaled_rotated_bitmap_region
+Suporte a espelhamento horizontal (direção do personagem)
+Escala de sprites ajustável
+Renderização de interface (HUD e diálogo)
+
+-------------------------------------------------------------------------------
+ESTRUTURA DO JOGO
+-------------------------------------------------------------------------------
+
+Estados principais:
+
+STATE_MENU:
+Navegação simples (START / EXIT)
+
+STATE_GAME:
+Gameplay ativo
+Movimento do jogador
+Sistema de diálogo ativo
+Renderização do mapa e sprites
+
+-------------------------------------------------------------------------------
+RECURSOS TÉCNICOS
+-------------------------------------------------------------------------------
+
+Allegro 5 (core)
+Allegro Image addon
+Allegro Font addon
+Allegro TTF addon
+Allegro Primitives addon
+
+-------------------------------------------------------------------------------
+NOTAS
+-------------------------------------------------------------------------------
+
+- O sistema de diálogo pode ser expandido para escolhas interativas
+- Estrutura modular (mapa, colisão, diálogo separados)
+
+-------------------------------------------------------------------------------

@@ -1,103 +1,3 @@
-/*
-Jogo de Reudisman
--------------------------------------------------------------------------------
-
-Este projeto demonstra a construção de um jogo 2D utilizando a biblioteca Allegro 5.
-
-O código implementa um sistema base de engine simples com:
-
--------------------------------------------------------------------------------
-FUNCIONALIDADES PRINCIPAIS
--------------------------------------------------------------------------------
-
-Inicialização da biblioteca Allegro 5
-Criação de janela (display)
-Sistema de eventos (event queue)
-Timer para controle de FPS fixo (60 FPS)
-Captura de entrada via teclado
-Loop principal de jogo (game loop)
-
--------------------------------------------------------------------------------
-GAMEPLAY
--------------------------------------------------------------------------------
-
-Movimento do jogador com teclas A / D / Setas
-Direção do personagem (esquerda/direita)
-Animação por spritesheet (frames)
-Sistema básico de colisão com bordas da tela
-Estrutura de estado (Menu / Jogo)
-
--------------------------------------------------------------------------------
-MAPA
--------------------------------------------------------------------------------
-
-Renderização de mapa de fundo (tilemap ou imagem)
-Função externa initMap() para carregar o cenário
-Função drawMap() para renderização
-Função destroyMap() para limpeza de memória
-
--------------------------------------------------------------------------------
-SISTEMA DE DIÁLOGO
--------------------------------------------------------------------------------
-Sistema de diálogo estilo RPG
-Suporte a múltiplas falas (array de strings)
-Controle de estado de diálogo (ativo/inativo)
-Avanço de falas com tecla ENTER
-
-EFEITO TYPEWRITER (máquina de escrever):
- Texto aparece letra por letra
- Controle de velocidade de digitação
-    ENTER:
-       completa texto instantaneamente
-       ou avança para próxima fala
-
-Interface de diálogo:
-    Caixa semi-transparente na parte inferior
-    Avatar do personagem exibido ao lado do texto
-
--------------------------------------------------------------------------------
-RENDERIZAÇÃO
--------------------------------------------------------------------------------
-
-Renderização de sprites com al_draw_tinted_scaled_rotated_bitmap_region
-Suporte a espelhamento horizontal (direção do personagem)
-Escala de sprites ajustável
-Renderização de interface (HUD e diálogo)
-
--------------------------------------------------------------------------------
-ESTRUTURA DO JOGO
--------------------------------------------------------------------------------
-
-Estados principais:
-
-STATE_MENU:
-Navegação simples (START / EXIT)
-
-STATE_GAME:
-Gameplay ativo
-Movimento do jogador
-Sistema de diálogo ativo
-Renderização do mapa e sprites
-
--------------------------------------------------------------------------------
-RECURSOS TÉCNICOS
--------------------------------------------------------------------------------
-
-Allegro 5 (core)
-Allegro Image addon
-Allegro Font addon
-Allegro TTF addon
-Allegro Primitives addon
-
--------------------------------------------------------------------------------
-NOTAS
--------------------------------------------------------------------------------
-
-- O sistema de diálogo pode ser expandido para escolhas interativas
-- Estrutura modular (mapa, colisão, diálogo separados)
-
--------------------------------------------------------------------------------
-*/
 #include "mapa.h"
 #include "colisao.h"
 
@@ -115,7 +15,7 @@ NOTAS
 #define STATE_MENU 0
 #define STATE_GAME 1
 
-#define MAX_DIALOGUES 10
+#define MAX_DIALOGUES 20
 
 typedef struct {
     char *lines[MAX_DIALOGUES];
@@ -225,24 +125,12 @@ int main() {
 
     al_start_timer(timer);
 
-    ///Mapas
-    Mapa mapas[2];
-
-    int totalMapas = 2;
-
-    int mapaAtual = 0;
-
-    // Carrega mapa 1
-if (!initMap(&mapas[0], "background1.png")) {
-    printf("Erro ao carregar mapa 1!\n");
-    return -1;
-}
-
-// Carrega mapa 2
-if (!initMap(&mapas[1], "background2.png")) {
-    printf("Erro ao carregar mapa 2!\n");
-    return -1;
-}
+    ///Mapa
+    Mapa mapa;
+    if (!initMap(&mapa, "background1.png")) {
+        printf("Erro ao carregar mapa!\n");
+        return -1;
+    }
 
     //Player
 
@@ -264,10 +152,7 @@ if (!initMap(&mapas[1], "background2.png")) {
     //Dialogos
     Dialogue dialogue = {0};
     dialogue.avatar = avatar;
-
-  loadDialoguesFromFile(&dialogue, "falas.txt");
-
-
+  loadDialoguesFromFile(&dialogue, "falaintroducao.txt");
 printf("Dialogos carregados: %d\n", dialogue.count);
 
 if (dialogue.count > 0) {
@@ -290,7 +175,7 @@ if (dialogue.count > 0) {
     int selected = 0;
 
     float x = 100;
-    float y = 600;
+    float y = 400;
     float speed = 5.0;
     int direction = 1;
 
@@ -303,7 +188,7 @@ if (dialogue.count > 0) {
     int frameW = sheetW / columns;
     int frameH = sheetH / rows;
 
-    float scale = 1.5;
+    float scale = 2.0;
 
     Rect playerBox;
 
@@ -311,6 +196,28 @@ if (dialogue.count > 0) {
     int frameTimer = 0;
     int frameDelay = 10;
     int maxFrames = 4;
+
+    // =========================
+// AVATAR INTRO
+// =========================
+
+ALLEGRO_BITMAP *avatarIntro = al_load_bitmap("avatarintro.png");
+
+if (!avatarIntro) {
+    printf("Erro ao carregar avatarintro!\n");
+    return -1;
+}
+
+int introColumns = 2;
+int introRows = 2;
+
+int introSheetW = al_get_bitmap_width(avatarIntro);
+int introSheetH = al_get_bitmap_height(avatarIntro);
+
+int introFrameW = introSheetW / introColumns;
+int introFrameH = introSheetH / introRows;
+
+int introFrame = 0;
 
  //Loop principal
 
@@ -343,6 +250,22 @@ if (dialogue.count > 0) {
                 }
 
                 if (gameState == STATE_GAME) {
+
+                    // =========================
+// TROCA FRAME PELO DIÁLOGO
+// =========================
+
+if (dialogue.current >= 5)
+    introFrame = 0;
+
+else if (dialogue.current >= 3)
+    introFrame = 1;
+
+else if (dialogue.current >= 2)
+    introFrame = 2;
+
+else
+    introFrame = 3;
 
                     //Animação da caixa de diálogo
 
@@ -379,21 +302,29 @@ if (dialogue.count > 0) {
     }
 }
 
-                   //Movimentação
+                 // =========================
+// MOVIMENTAÇÃO
+// =========================
 
-                    bool moving = false;
+bool moving = false;
 
-                    if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT]) {
-                        x += speed;
-                        direction = 1;
-                        moving = true;
-                    }
+// Só movimenta se NÃO estiver em diálogo
+if (!dialogue.active) {
 
-                    if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT]) {
-                        x -= speed;
-                        direction = -1;
-                        moving = true;
-                    }
+    if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT]) {
+
+        x += speed;
+        direction = 1;
+        moving = true;
+    }
+
+    if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT]) {
+
+        x -= speed;
+        direction = -1;
+        moving = true;
+    }
+}
 
                     playerBox.w = frameW * scale;
                     playerBox.h = frameH * scale;
@@ -404,16 +335,6 @@ if (dialogue.count > 0) {
 
                     x = playerBox.x;
                     y = playerBox.y;
-
-                    if (
-                        x >= screenW &&
-                        mapaAtual < totalMapas - 1
-                        )
-                        {
-                            mapaAtual++;
-
-                            x = 50;
-                        }
 
                     if (moving) {
                         frameTimer++;
@@ -479,14 +400,7 @@ if (dialogue.count > 0) {
             
             if (gameState == STATE_GAME) {
 
-                drawMap(
-                    &mapas[
-                        buscarMapa(
-                        mapaAtual,
-                        totalMapas
-                        )
-                    ]
-                );
+                drawMap(&mapa);
 
                 int frameX = (currentFrame % columns) * frameW;
                 int frameY = (currentFrame / columns) * frameH;
@@ -496,16 +410,57 @@ if (dialogue.count > 0) {
 
                 float scaleX = (direction == -1) ? -scale : scale;
 
-                al_draw_tinted_scaled_rotated_bitmap_region(
-                    player,
-                    frameX, frameY,
-                    frameW, frameH,
-                    al_map_rgb(255,255,255),
-                    centerX, centerY,
-                    x, y,
-                    scaleX, scale,
-                    0, 0
-                );
+// =========================
+// PLAYER NORMAL
+// =========================
+
+if (!dialogue.active) {
+
+    al_draw_tinted_scaled_rotated_bitmap_region(
+        player,
+        frameX, frameY,
+        frameW, frameH,
+        al_map_rgb(255,255,255),
+        centerX, centerY,
+        x, y,
+        scaleX, scale,
+        0, 0
+    );
+}
+
+
+
+// =========================
+// AVATARINTRO DURANTE FALA
+// =========================
+
+if (dialogue.active) {
+
+    int introX =
+        (introFrame % introColumns)
+        * introFrameW;
+
+    int introY =
+        (introFrame / introColumns)
+        * introFrameH;
+
+    al_draw_tinted_scaled_rotated_bitmap_region(
+        avatarIntro,
+        introX,
+        introY,
+        introFrameW,
+        introFrameH,
+        al_map_rgb(255,255,255),
+        introFrameW / 2.0,
+        introFrameH / 2.0,
+        x,
+        y,
+        scaleX,
+        scale,
+        0,
+        0
+    );
+}
 
                 
                 //Caixa de diálogo
@@ -565,17 +520,9 @@ if (dialogue.count > 0) {
     
     // Limpeza
     al_destroy_font(font);
-
-    for (
-        int i = 0;
-        i < totalMapas;
-        i++
-            )
-        destroyMap(
-        &mapas[i]
-    );
-
+    destroyMap(&mapa);
     al_destroy_bitmap(player);
+    al_destroy_bitmap(avatarIntro);
     al_destroy_bitmap(avatar);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
