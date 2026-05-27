@@ -125,7 +125,7 @@ int main() {
 
     al_start_timer(timer);
 
-    ///Mapa
+    //Mapa
     Mapa mapa;
     if (!initMap(&mapa, "background1.png")) {
         printf("Erro ao carregar mapa!\n");
@@ -140,9 +140,8 @@ int main() {
         return -1;
     }
 
-    // =========================
     // AVATAR
-    // =========================
+    
     ALLEGRO_BITMAP *avatar = al_load_bitmap("avatar.png");
     if (!avatar) {
         printf("Erro ao carregar avatar!\n");
@@ -197,9 +196,9 @@ if (dialogue.count > 0) {
     int frameDelay = 10;
     int maxFrames = 4;
 
-    // =========================
+
 // AVATAR INTRO
-// =========================
+
 
 ALLEGRO_BITMAP *avatarIntro = al_load_bitmap("avatarintro.png");
 
@@ -251,9 +250,9 @@ int introFrame = 0;
 
                 if (gameState == STATE_GAME) {
 
-                    // =========================
+
 // TROCA FRAME PELO DIÁLOGO
-// =========================
+
 
 if (dialogue.current >= 5)
     introFrame = 0;
@@ -302,9 +301,7 @@ else
     }
 }
 
-                 // =========================
 // MOVIMENTAÇÃO
-// =========================
 
 bool moving = false;
 
@@ -394,7 +391,6 @@ if (!dialogue.active) {
                     ALLEGRO_ALIGN_CENTER,
                     selected == 1 ? "> Sair" : "Sair");
             }
-
             
             // Jogo
             
@@ -410,9 +406,8 @@ if (!dialogue.active) {
 
                 float scaleX = (direction == -1) ? -scale : scale;
 
-// =========================
+
 // PLAYER NORMAL
-// =========================
 
 if (!dialogue.active) {
 
@@ -428,11 +423,7 @@ if (!dialogue.active) {
     );
 }
 
-
-
-// =========================
 // AVATARINTRO DURANTE FALA
-// =========================
 
 if (dialogue.active) {
 
@@ -461,7 +452,6 @@ if (dialogue.active) {
         0
     );
 }
-
                 
                 //Caixa de diálogo
                 
@@ -516,8 +506,7 @@ if (dialogue.active) {
             al_flip_display();
         }
     }
-
-    
+   
     // Limpeza
     al_destroy_font(font);
     destroyMap(&mapa);
