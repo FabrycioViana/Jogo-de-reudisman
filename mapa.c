@@ -40,7 +40,7 @@ void destroyMap(Mapa *mapa) {
 
     al_destroy_bitmap(mapa->background);
 }
-//busca linear tambem
+
 int buscarMapa(int mapaAtual, int total) {
 
     for (int i = 0; i < total; i++) {
