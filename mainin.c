@@ -148,17 +148,17 @@ int main() {
         return -1;
     }
 
-    //Dialogos
-    Dialogue dialogue = {0};
-    dialogue.avatar = avatar;
-  loadDialoguesFromFile(&dialogue, "falaintroducao.txt");
-printf("Dialogos carregados: %d\n", dialogue.count);
+            //Dialogos
+        Dialogue dialogue = {0};
+        dialogue.avatar = avatar;
+            loadDialoguesFromFile(&dialogue, "falaintroducao.txt");
+            printf("Dialogos carregados: %d\n", dialogue.count);
 
-if (dialogue.count > 0) {
-    startDialogue(&dialogue);
-} else {
-    printf("Nenhum dialogo carregado!\n");
-}
+        if (dialogue.count > 0) {
+            startDialogue(&dialogue);
+        } else {
+            printf("Nenhum dialogo carregado!\n");
+        }
    //Inputs
     al_register_event_source(queue, al_get_display_event_source(display));
     al_register_event_source(queue, al_get_timer_event_source(timer));
@@ -174,7 +174,7 @@ if (dialogue.count > 0) {
     int selected = 0;
 
     float x = 100;
-    float y = 400;
+    float y = 700;
     float speed = 5.0;
     int direction = 1;
 
@@ -200,71 +200,71 @@ if (dialogue.count > 0) {
 // AVATAR INTRO
 
 
-ALLEGRO_BITMAP *avatarIntro = al_load_bitmap("avatarintro.png");
+            ALLEGRO_BITMAP *avatarIntro = al_load_bitmap("avatarintro.png");
 
-if (!avatarIntro) {
-    printf("Erro ao carregar avatarintro!\n");
-    return -1;
-}
+            if (!avatarIntro) {
+                printf("Erro ao carregar avatarintro!\n");
+                return -1;
+            }
 
-int introColumns = 2;
-int introRows = 2;
+            int introColumns = 2;
+            int introRows = 2;
 
-int introSheetW = al_get_bitmap_width(avatarIntro);
-int introSheetH = al_get_bitmap_height(avatarIntro);
+            int introSheetW = al_get_bitmap_width(avatarIntro);
+            int introSheetH = al_get_bitmap_height(avatarIntro);
 
-int introFrameW = introSheetW / introColumns;
-int introFrameH = introSheetH / introRows;
+            int introFrameW = introSheetW / introColumns;
+            int introFrameH = introSheetH / introRows;
 
-int introFrame = 0;
+            int introFrame = 0;
 
- //Loop principal
+                //Loop principal
 
-    while (running) {
+                    while (running) {
 
-        ALLEGRO_EVENT event;
-        al_wait_for_event(queue, &event);
+                        ALLEGRO_EVENT event;
+                        al_wait_for_event(queue, &event);
 
-        switch (event.type) {
+                        switch (event.type) {
 
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                running = false;
-                break;
+                            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                                running = false;
+                                break;
 
-            case ALLEGRO_EVENT_TIMER: {
+                            case ALLEGRO_EVENT_TIMER: {
 
-                if (gameState == STATE_MENU) {
+                                if (gameState == STATE_MENU) {
 
-                    if (keys[ALLEGRO_KEY_W]) selected = 0;
-                    if (keys[ALLEGRO_KEY_S]) selected = 1;
+                                    if (keys[ALLEGRO_KEY_W]) selected = 0;
+                                    if (keys[ALLEGRO_KEY_S]) selected = 1;
 
-                    if (keys[ALLEGRO_KEY_ENTER] && !enterPressed) {
-                        enterPressed = true;
+                                    if (keys[ALLEGRO_KEY_ENTER] && !enterPressed) {
+                                        enterPressed = true;
 
-                        if (selected == 0)
-                            gameState = STATE_GAME;
-                        else
-                            running = false;
-                    }
-                }
+                                        if (selected == 0)
+                                            gameState = STATE_GAME;
+                                        else
+                                            running = false;
+                                    }
+                                }
 
                 if (gameState == STATE_GAME) {
 
 
-// TROCA FRAME PELO DIÁLOGO
+                // TROCA FRAME PELO DIÁLOGO
 
 
-if (dialogue.current >= 5)
-    introFrame = 0;
+                if (dialogue.current >= 5)
+                    introFrame = 0;
 
-else if (dialogue.current >= 3)
-    introFrame = 1;
+                else if (dialogue.current >= 3)
+                    introFrame = 1;
 
-else if (dialogue.current >= 2)
-    introFrame = 2;
+                else if (dialogue.current >= 2)
+                    introFrame = 2;
 
-else
-    introFrame = 3;
+                else
+                    introFrame = 3;
 
                     //Animação da caixa de diálogo
 
@@ -283,45 +283,45 @@ else
                         }
                     }
 
-    //Ação de pular o dialogo
+                            //Ação de pular o dialogo
 
-                  if (dialogue.active &&
-    keys[ALLEGRO_KEY_ENTER] &&
-    !enterPressed) {
+                                        if (dialogue.active &&
+                            keys[ALLEGRO_KEY_ENTER] &&
+                            !enterPressed) {
 
-    enterPressed = true;
+                            enterPressed = true;
 
-    const char *currentText = getDialogue(&dialogue);
-    int len = strlen(currentText);
+                            const char *currentText = getDialogue(&dialogue);
+                            int len = strlen(currentText);
 
-    if (dialogue.charIndex < len) {
-        dialogue.charIndex = len;
-    } else {
-        nextDialogue(&dialogue);
-    }
-}
+                            if (dialogue.charIndex < len) {
+                                dialogue.charIndex = len;
+                            } else {
+                                nextDialogue(&dialogue);
+                            }
+                        }
 
-// MOVIMENTAÇÃO
+                        // MOVIMENTAÇÃO
 
-bool moving = false;
+                        bool moving = false;
 
-// Só movimenta se NÃO estiver em diálogo
-if (!dialogue.active) {
+                        // Só movimenta se NÃO estiver em diálogo
+                        if (!dialogue.active) {
 
-    if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT]) {
+                            if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT]) {
 
-        x += speed;
-        direction = 1;
-        moving = true;
-    }
+                                x += speed;
+                                direction = 1;
+                                moving = true;
+                            }
 
-    if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT]) {
+                            if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT]) {
 
-        x -= speed;
-        direction = -1;
-        moving = true;
-    }
-}
+                                x -= speed;
+                                direction = -1;
+                                moving = true;
+                            }
+                        }
 
                     playerBox.w = frameW * scale;
                     playerBox.h = frameH * scale;
@@ -407,51 +407,51 @@ if (!dialogue.active) {
                 float scaleX = (direction == -1) ? -scale : scale;
 
 
-// PLAYER NORMAL
+                // PLAYER NORMAL
 
-if (!dialogue.active) {
+                if (!dialogue.active) {
 
-    al_draw_tinted_scaled_rotated_bitmap_region(
-        player,
-        frameX, frameY,
-        frameW, frameH,
-        al_map_rgb(255,255,255),
-        centerX, centerY,
-        x, y,
-        scaleX, scale,
-        0, 0
-    );
-}
+                    al_draw_tinted_scaled_rotated_bitmap_region(
+                        player,
+                        frameX, frameY,
+                        frameW, frameH,
+                        al_map_rgb(255,255,255),
+                        centerX, centerY,
+                        x, y,
+                        scaleX, scale,
+                        0, 0
+                    );
+                }
 
-// AVATARINTRO DURANTE FALA
+                // AVATARINTRO DURANTE FALA
 
-if (dialogue.active) {
+                if (dialogue.active) {
 
-    int introX =
-        (introFrame % introColumns)
-        * introFrameW;
+                    int introX =
+                        (introFrame % introColumns)
+                        * introFrameW;
 
-    int introY =
-        (introFrame / introColumns)
-        * introFrameH;
+                    int introY =
+                        (introFrame / introColumns)
+                        * introFrameH;
 
-    al_draw_tinted_scaled_rotated_bitmap_region(
-        avatarIntro,
-        introX,
-        introY,
-        introFrameW,
-        introFrameH,
-        al_map_rgb(255,255,255),
-        introFrameW / 2.0,
-        introFrameH / 2.0,
-        x,
-        y,
-        scaleX,
-        scale,
-        0,
-        0
-    );
-}
+                    al_draw_tinted_scaled_rotated_bitmap_region(
+                        avatarIntro,
+                        introX,
+                        introY,
+                        introFrameW,
+                        introFrameH,
+                        al_map_rgb(255,255,255),
+                        introFrameW / 2.0,
+                        introFrameH / 2.0,
+                        x,
+                        y,
+                        scaleX,
+                        scale,
+                        0,
+                        0
+                    );
+                }
                 
                 //Caixa de diálogo
                 
