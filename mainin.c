@@ -308,7 +308,7 @@ int main()
     }
 
     // Player
-    ALLEGRO_BITMAP *player = al_load_bitmap("player3.png");
+    ALLEGRO_BITMAP *player = al_load_bitmap("image.png");
     if (!player)
     {
         printf("Erro ao carregar player!\n");
@@ -352,19 +352,18 @@ int main()
     int selected = 0;
 
     float x = 100;
-    float y = 700;
+    float y = 570;
     float speed = 5.0;
     int direction = 1;
 
     int mapaAtual = 1;
 
-InfoMapa mapas[] = {
+    InfoMapa mapas[] = {
 
-    {1, "background1.png"},
-    {2, "background2.png"}
-};
+        {1, "background1.png"},
+        {2, "background2.png"}};
 
-int totalMapas = 2;
+    int totalMapas = 2;
 
     int playTime = 0;
     int timeCounter = 0;
@@ -372,8 +371,8 @@ int totalMapas = 2;
     int sheetW = al_get_bitmap_width(player);
     int sheetH = al_get_bitmap_height(player);
 
-    int columns = 2;
-    int rows = 2;
+    int columns = 8;
+    int rows = 1;
 
     int frameW = sheetW / columns;
     int frameH = sheetH / rows;
@@ -385,7 +384,7 @@ int totalMapas = 2;
     int currentFrame = 0;
     int frameTimer = 0;
     int frameDelay = 10;
-    int maxFrames = 4;
+    int maxFrames = 8;
 
     // AVATAR INTRO
     ALLEGRO_BITMAP *avatarIntro = al_load_bitmap("avatarintro.png");
@@ -543,31 +542,34 @@ int totalMapas = 2;
 
                 // TROCA DE MAPA
 
-if (x >= screenW - frameW * scale) {
+                if (x >= screenW - frameW * scale)
+                {
 
-    mapaAtual++;
+                    mapaAtual++;
 
-    if (mapaAtual > totalMapas)
-        mapaAtual = 1;
+                    if (mapaAtual > totalMapas)
+                        mapaAtual = 1;
 
-    int indice =
-        buscarMapaPorID(mapas,
-                         totalMapas,
-                         mapaAtual);
+                    int indice =
+                        buscarMapaPorID(mapas,
+                                        totalMapas,
+                                        mapaAtual);
 
-    if (indice != -1) {
+                    if (indice != -1)
+                    {
 
-        destroyMap(&mapa);
+                        destroyMap(&mapa);
 
-        if (!initMap(&mapa,
-                     mapas[indice].arquivo)) {
+                        if (!initMap(&mapa,
+                                     mapas[indice].arquivo))
+                        {
 
-            printf("Erro ao carregar novo mapa!\n");
-        }
+                            printf("Erro ao carregar novo mapa!\n");
+                        }
 
-        x = 50;
-    }
-}
+                        x = 50;
+                    }
+                }
 
                 if (moving)
                 {
