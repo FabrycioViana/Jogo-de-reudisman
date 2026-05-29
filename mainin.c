@@ -294,6 +294,9 @@ int main()
 
     ALLEGRO_FONT *font = al_create_builtin_font();
 
+    ALLEGRO_FONT *tituloFont =
+        al_load_ttf_font("arial.ttf", 72, 0);
+
     al_start_timer(timer);
 
     // Mapa
@@ -618,7 +621,7 @@ int main()
             if (gameState == STATE_MENU)
             {
 
-                al_draw_text(font,
+                al_draw_text(tituloFont,
                              al_map_rgb(255, 255, 255),
                              screenW / 2, 300,
                              ALLEGRO_ALIGN_CENTER,
@@ -768,6 +771,7 @@ int main()
     }
 
     // Limpeza
+    al_destroy_font(tituloFont);
     al_destroy_font(font);
     destroyMap(&mapa);
     al_destroy_bitmap(player);
