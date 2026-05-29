@@ -761,7 +761,7 @@ int main()
                     buffer[len] = '\0';
 
                     al_draw_filled_rectangle(
-                        0, screenH - 200,
+                        0, screenH - 100,
                         screenW, screenH,
                         al_map_rgba(0, 0, 0, 180));
 
@@ -779,7 +779,7 @@ int main()
                     al_draw_text(font,
                                  al_map_rgb(255, 255, 255),
                                  screenW / 2,
-                                 screenH - 150,
+                                 screenH - 35,
                                  ALLEGRO_ALIGN_CENTER,
                                  buffer);
 
