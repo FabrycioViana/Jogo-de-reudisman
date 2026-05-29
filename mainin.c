@@ -308,7 +308,6 @@ int main()
     }
 
     // Player
-
     ALLEGRO_BITMAP *player = al_load_bitmap("player3.png");
     if (!player)
     {
@@ -317,7 +316,6 @@ int main()
     }
 
     // AVATAR
-
     ALLEGRO_BITMAP *avatar = al_load_bitmap("avatar.png");
     if (!avatar)
     {
@@ -380,7 +378,6 @@ int main()
     int maxFrames = 4;
 
     // AVATAR INTRO
-
     ALLEGRO_BITMAP *avatarIntro = al_load_bitmap("avatarintro.png");
 
     if (!avatarIntro)
@@ -401,7 +398,6 @@ int main()
     int introFrame = 0;
 
     // Loop principal
-
     while (running)
     {
 
@@ -441,7 +437,6 @@ int main()
             {
 
                 // CONTADOR DE TEMPO DE JOGO
-
                 timeCounter++;
 
                 if (timeCounter >= 60)
@@ -451,7 +446,6 @@ int main()
                 }
 
                 // TROCA FRAME PELO DIÁLOGO
-
                 if (dialogue.current >= 5)
                     introFrame = 0;
 
@@ -465,7 +459,6 @@ int main()
                     introFrame = 3;
 
                 // Animação da caixa de diálogo
-
                 if (dialogue.active)
                 {
 
@@ -484,7 +477,6 @@ int main()
                 }
 
                 // Ação de pular o dialogo
-
                 if (dialogue.active &&
                     keys[ALLEGRO_KEY_ENTER] &&
                     !enterPressed)
@@ -506,7 +498,6 @@ int main()
                 }
 
                 // MOVIMENTAÇÃO
-
                 bool moving = false;
 
                 // Só movimenta se NÃO estiver em diálogo
@@ -617,7 +608,6 @@ int main()
             al_clear_to_color(al_map_rgb(0, 0, 0));
 
             // Menu
-
             if (gameState == STATE_MENU)
             {
 
@@ -652,15 +642,14 @@ int main()
 
                     al_draw_text(font,
                                  al_map_rgb(255, 255, 255),
-                                 900,
-                                 100 + i * 30,
+                                 1000,
+                                 100 + i * 20,
                                  0,
                                  buffer);
                 }
             }
 
             // Jogo
-
             if (gameState == STATE_GAME)
             {
 
@@ -675,7 +664,6 @@ int main()
                 float scaleX = (direction == -1) ? -scale : scale;
 
                 // PLAYER NORMAL
-
                 if (!dialogue.active)
                 {
 
@@ -691,7 +679,6 @@ int main()
                 }
 
                 // AVATAR INTRO DURANTE FALA
-
                 if (dialogue.active)
                 {
 
@@ -719,7 +706,6 @@ int main()
                 }
 
                 // Caixa de diálogo
-
                 if (dialogue.active)
                 {
 
