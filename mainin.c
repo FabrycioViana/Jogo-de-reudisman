@@ -356,6 +356,16 @@ int main()
     float speed = 5.0;
     int direction = 1;
 
+    int mapaAtual = 1;
+
+InfoMapa mapas[] = {
+
+    {1, "background1.png"},
+    {2, "background2.png"}
+};
+
+int totalMapas = 2;
+
     int playTime = 0;
     int timeCounter = 0;
 
@@ -530,6 +540,34 @@ int main()
 
                 x = playerBox.x;
                 y = playerBox.y;
+
+                // TROCA DE MAPA
+
+if (x >= screenW - frameW * scale) {
+
+    mapaAtual++;
+
+    if (mapaAtual > totalMapas)
+        mapaAtual = 1;
+
+    int indice =
+        buscarMapaPorID(mapas,
+                         totalMapas,
+                         mapaAtual);
+
+    if (indice != -1) {
+
+        destroyMap(&mapa);
+
+        if (!initMap(&mapa,
+                     mapas[indice].arquivo)) {
+
+            printf("Erro ao carregar novo mapa!\n");
+        }
+
+        x = 50;
+    }
+}
 
                 if (moving)
                 {

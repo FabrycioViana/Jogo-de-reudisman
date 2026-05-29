@@ -14,13 +14,19 @@ typedef struct
 
 } Mapa;
 
+typedef struct{
+int id;
+char arquivo[50];
+}InfoMapa;
+
 bool initMap(Mapa *mapa, const char *path);
 
 void drawMap(Mapa *mapa);
 
 void destroyMap(Mapa *mapa);
 
-// busca linear para os mapas
-int buscarMapa(int mapaAtual, int total);
+int buscarMapaPorID(InfoMapa mapas[],
+                    int total,
+                    int id);
 
 #endif

@@ -43,15 +43,15 @@ void destroyMap(Mapa *mapa)
     al_destroy_bitmap(mapa->background);
 }
 
-int buscarMapa(int mapaAtual, int total)
-{
+int buscarMapaPorID(InfoMapa mapas[],
+                    int total,
+                    int id) {
 
-    for (int i = 0; i < total; i++)
-    {
+    for (int i = 0; i < total; i++) {
 
-        if (i == mapaAtual)
+        if (mapas[i].id == id)
             return i;
     }
 
-    return 0;
+    return -1;
 }
