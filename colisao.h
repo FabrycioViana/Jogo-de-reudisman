@@ -3,7 +3,8 @@
 
 #include <stdbool.h>
 
-typedef struct {
+typedef struct
+{
 
     float x;
     float y;

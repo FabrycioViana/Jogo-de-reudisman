@@ -1,7 +1,8 @@
 #include "mapa.h"
 #include <allegro5/allegro_image.h>
 
-bool initMap(Mapa *mapa, const char *path) {
+bool initMap(Mapa *mapa, const char *path)
+{
 
     mapa->background = al_load_bitmap(path);
 
@@ -14,7 +15,8 @@ bool initMap(Mapa *mapa, const char *path) {
     return true;
 }
 
-void drawMap(Mapa *mapa) {
+void drawMap(Mapa *mapa)
+{
 
     al_draw_scaled_bitmap(
 
@@ -32,18 +34,20 @@ void drawMap(Mapa *mapa) {
         1280,
         720,
 
-        0
-    );
+        0);
 }
 
-void destroyMap(Mapa *mapa) {
+void destroyMap(Mapa *mapa)
+{
 
     al_destroy_bitmap(mapa->background);
 }
 
-int buscarMapa(int mapaAtual, int total) {
+int buscarMapa(int mapaAtual, int total)
+{
 
-    for (int i = 0; i < total; i++) {
+    for (int i = 0; i < total; i++)
+    {
 
         if (i == mapaAtual)
             return i;

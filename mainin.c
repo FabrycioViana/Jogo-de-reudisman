@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <string.h> 
+#include <string.h>
 #include <stdlib.h>
 
 #define STATE_MENU 0
@@ -17,7 +17,8 @@
 
 #define MAX_DIALOGUES 20
 
-typedef struct {
+typedef struct
+{
     char *lines[MAX_DIALOGUES];
     int count;
     int current;
@@ -30,7 +31,8 @@ typedef struct {
     int typeSpeed;
 } Dialogue;
 
-typedef struct {
+typedef struct
+{
     float playerX;
     float playerY;
 
@@ -43,7 +45,8 @@ typedef struct {
     bool dialogueActive;
 } SaveData;
 
-typedef struct {
+typedef struct
+{
     char nome[20];
     int tempo;
 } Score;
@@ -53,7 +56,8 @@ typedef struct {
 Score ranking[MAX_RANK];
 int rankingCount = 0;
 
-void addDialogue(Dialogue *d, const char *text) {
+void addDialogue(Dialogue *d, const char *text)
+{
 
     if (d->count >= MAX_DIALOGUES)
         return;
@@ -68,11 +72,13 @@ void addDialogue(Dialogue *d, const char *text) {
     d->lines[d->count++] = copy;
 }
 
-void loadDialoguesFromFile(Dialogue *d, const char *filename) {
+void loadDialoguesFromFile(Dialogue *d, const char *filename)
+{
 
     FILE *file = fopen(filename, "r");
 
-    if (!file) {
+    if (!file)
+    {
         perror("fopen falhou");
         printf("Arquivo tentado: %s\n", filename);
         return;
@@ -80,7 +86,8 @@ void loadDialoguesFromFile(Dialogue *d, const char *filename) {
 
     char buffer[256];
 
-    while (fgets(buffer, sizeof(buffer), file)) {
+    while (fgets(buffer, sizeof(buffer), file))
+    {
 
         buffer[strcspn(buffer, "\n")] = '\0';
 
@@ -90,7 +97,8 @@ void loadDialoguesFromFile(Dialogue *d, const char *filename) {
 
     fclose(file);
 }
-void startDialogue(Dialogue *d) {
+void startDialogue(Dialogue *d)
+{
 
     if (d->count <= 0)
         return;
@@ -103,7 +111,8 @@ void startDialogue(Dialogue *d) {
     d->typeSpeed = 2;
 }
 
-void nextDialogue(Dialogue *d) {
+void nextDialogue(Dialogue *d)
+{
 
     if (d->current < d->count - 1)
         d->current++;
@@ -114,7 +123,8 @@ void nextDialogue(Dialogue *d) {
     d->typeTimer = 0;
 }
 
-const char* getDialogue(Dialogue *d) {
+const char *getDialogue(Dialogue *d)
+{
 
     if (!d->active)
         return "";
@@ -134,11 +144,13 @@ void saveGame(const char *filename,
               int direction,
               int currentFrame,
               int gameState,
-              Dialogue *dialogue) {
+              Dialogue *dialogue)
+{
 
     FILE *file = fopen(filename, "wb");
 
-    if (!file) {
+    if (!file)
+    {
         printf("Erro ao criar save!\n");
         return;
     }
@@ -169,11 +181,13 @@ void loadGame(const char *filename,
               int *direction,
               int *currentFrame,
               int *gameState,
-              Dialogue *dialogue) {
+              Dialogue *dialogue)
+{
 
     FILE *file = fopen(filename, "rb");
 
-    if (!file) {
+    if (!file)
+    {
         printf("Save nao encontrado!\n");
         return;
     }
@@ -198,12 +212,16 @@ void loadGame(const char *filename,
     printf("Jogo carregado!\n");
 }
 
-void ordenarRanking() {
+void ordenarRanking()
+{
 
-    for (int i = 0; i < rankingCount - 1; i++) {
-        for (int j = 0; j < rankingCount - i - 1; j++) {
+    for (int i = 0; i < rankingCount - 1; i++)
+    {
+        for (int j = 0; j < rankingCount - i - 1; j++)
+        {
 
-            if (ranking[j].tempo > ranking[j + 1].tempo) {
+            if (ranking[j].tempo > ranking[j + 1].tempo)
+            {
 
                 Score temp = ranking[j];
                 ranking[j] = ranking[j + 1];
@@ -213,10 +231,12 @@ void ordenarRanking() {
     }
 }
 
-void salvarRanking() {
+void salvarRanking()
+{
 
     FILE *f = fopen("ranking.bin", "wb");
-    if (!f) return;
+    if (!f)
+        return;
 
     fwrite(&rankingCount, sizeof(int), 1, f);
     fwrite(ranking, sizeof(Score), rankingCount, f);
@@ -224,10 +244,12 @@ void salvarRanking() {
     fclose(f);
 }
 
-void carregarRanking() {
+void carregarRanking()
+{
 
     FILE *f = fopen("ranking.bin", "rb");
-    if (!f) return;
+    if (!f)
+        return;
 
     fread(&rankingCount, sizeof(int), 1, f);
     fread(ranking, sizeof(Score), rankingCount, f);
@@ -237,9 +259,11 @@ void carregarRanking() {
     ordenarRanking();
 }
 
-void adicionarScore(const char *nome, int tempo) {
+void adicionarScore(const char *nome, int tempo)
+{
 
-    if (rankingCount < MAX_RANK) {
+    if (rankingCount < MAX_RANK)
+    {
 
         strcpy(ranking[rankingCount].nome, nome);
         ranking[rankingCount].tempo = tempo;
@@ -251,7 +275,8 @@ void adicionarScore(const char *nome, int tempo) {
     salvarRanking();
 }
 
-int main() {
+int main()
+{
 
     al_init();
     al_install_keyboard();
@@ -271,41 +296,47 @@ int main() {
 
     al_start_timer(timer);
 
-    //Mapa
+    // Mapa
     Mapa mapa;
-    if (!initMap(&mapa, "background1.png")) {
+    if (!initMap(&mapa, "background1.png"))
+    {
         printf("Erro ao carregar mapa!\n");
         return -1;
     }
 
-    //Player
+    // Player
 
     ALLEGRO_BITMAP *player = al_load_bitmap("player3.png");
-    if (!player) {
+    if (!player)
+    {
         printf("Erro ao carregar player!\n");
         return -1;
     }
 
     // AVATAR
-    
+
     ALLEGRO_BITMAP *avatar = al_load_bitmap("avatar.png");
-    if (!avatar) {
+    if (!avatar)
+    {
         printf("Erro ao carregar avatar!\n");
         return -1;
     }
 
-    //Dialogos
+    // Dialogos
     Dialogue dialogue = {0};
     dialogue.avatar = avatar;
-  loadDialoguesFromFile(&dialogue, "falaintroducao.txt");
-printf("Dialogos carregados: %d\n", dialogue.count);
+    loadDialoguesFromFile(&dialogue, "falaintroducao.txt");
+    printf("Dialogos carregados: %d\n", dialogue.count);
 
-if (dialogue.count > 0) {
-    startDialogue(&dialogue);
-} else {
-    printf("Nenhum dialogo carregado!\n");
-}
-   //Inputs
+    if (dialogue.count > 0)
+    {
+        startDialogue(&dialogue);
+    }
+    else
+    {
+        printf("Nenhum dialogo carregado!\n");
+    }
+    // Inputs
     al_register_event_source(queue, al_get_display_event_source(display));
     al_register_event_source(queue, al_get_timer_event_source(timer));
     al_register_event_source(queue, al_get_keyboard_event_source());
@@ -313,7 +344,7 @@ if (dialogue.count > 0) {
     bool running = true;
     bool redraw = false;
 
-    bool keys[ALLEGRO_KEY_MAX] = { false };
+    bool keys[ALLEGRO_KEY_MAX] = {false};
     bool enterPressed = false;
 
     int gameState = STATE_MENU;
@@ -323,7 +354,7 @@ if (dialogue.count > 0) {
     float y = 700;
     float speed = 5.0;
     int direction = 1;
-    
+
     int playTime = 0;
     int timeCounter = 0;
 
@@ -345,265 +376,290 @@ if (dialogue.count > 0) {
     int frameDelay = 10;
     int maxFrames = 4;
 
+    // AVATAR INTRO
 
-// AVATAR INTRO
+    ALLEGRO_BITMAP *avatarIntro = al_load_bitmap("avatarintro.png");
 
+    if (!avatarIntro)
+    {
+        printf("Erro ao carregar avatarintro!\n");
+        return -1;
+    }
 
-ALLEGRO_BITMAP *avatarIntro = al_load_bitmap("avatarintro.png");
+    int introColumns = 2;
+    int introRows = 2;
 
-if (!avatarIntro) {
-    printf("Erro ao carregar avatarintro!\n");
-    return -1;
-}
+    int introSheetW = al_get_bitmap_width(avatarIntro);
+    int introSheetH = al_get_bitmap_height(avatarIntro);
 
-int introColumns = 2;
-int introRows = 2;
+    int introFrameW = introSheetW / introColumns;
+    int introFrameH = introSheetH / introRows;
 
-int introSheetW = al_get_bitmap_width(avatarIntro);
-int introSheetH = al_get_bitmap_height(avatarIntro);
+    int introFrame = 0;
 
-int introFrameW = introSheetW / introColumns;
-int introFrameH = introSheetH / introRows;
+    // Loop principal
 
-int introFrame = 0;
-
- //Loop principal
-
-    while (running) {
+    while (running)
+    {
 
         ALLEGRO_EVENT event;
         al_wait_for_event(queue, &event);
 
-        switch (event.type) {
+        switch (event.type)
+        {
 
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                running = false;
-                break;
+        case ALLEGRO_EVENT_DISPLAY_CLOSE:
+            running = false;
+            break;
 
-            case ALLEGRO_EVENT_TIMER: {
+        case ALLEGRO_EVENT_TIMER:
+        {
 
-                if (gameState == STATE_MENU) {
+            if (gameState == STATE_MENU)
+            {
 
-                    if (keys[ALLEGRO_KEY_W]) selected = 0;
-                    if (keys[ALLEGRO_KEY_S]) selected = 1;
+                if (keys[ALLEGRO_KEY_W] || keys[ALLEGRO_KEY_UP])
+                    selected = 0;
+                if (keys[ALLEGRO_KEY_S] || keys[ALLEGRO_KEY_DOWN])
+                    selected = 1;
 
-                    if (keys[ALLEGRO_KEY_ENTER] && !enterPressed) {
-                        enterPressed = true;
+                if (keys[ALLEGRO_KEY_ENTER] && !enterPressed)
+                {
+                    enterPressed = true;
 
-                        if (selected == 0)
-                            gameState = STATE_GAME;
-                        else
-                            running = false;
-                    }
+                    if (selected == 0)
+                        gameState = STATE_GAME;
+                    else
+                        running = false;
                 }
-
-                if (gameState == STATE_GAME) {
-
-
-// ⏱️ CONTADOR DE TEMPO DE JOGO
-
-    timeCounter++;
-
-    if (timeCounter >= 60) {
-        playTime++;
-        timeCounter = 0;
-    }
-
-
-// TROCA FRAME PELO DIÁLOGO
-
-
-if (dialogue.current >= 5)
-    introFrame = 0;
-
-else if (dialogue.current >= 3)
-    introFrame = 1;
-
-else if (dialogue.current >= 2)
-    introFrame = 2;
-
-else
-    introFrame = 3;
-
-                    //Animação da caixa de diálogo
-
-                    if (dialogue.active) {
-
-                        dialogue.typeTimer++;
-
-                        if (dialogue.typeTimer >= dialogue.typeSpeed) {
-                            dialogue.typeTimer = 0;
-
-                            const char *currentText = getDialogue(&dialogue);
-                                int len = strlen(currentText);
-
-                            if (dialogue.charIndex < len)
-                                dialogue.charIndex++;
-                        }
-                    }
-
-    //Ação de pular o dialogo
-
-                  if (dialogue.active &&
-    keys[ALLEGRO_KEY_ENTER] &&
-    !enterPressed) {
-
-    enterPressed = true;
-
-    const char *currentText = getDialogue(&dialogue);
-    int len = strlen(currentText);
-
-    if (dialogue.charIndex < len) {
-        dialogue.charIndex = len;
-    } else {
-        nextDialogue(&dialogue);
-    }
-}
-
-// MOVIMENTAÇÃO
-
-bool moving = false;
-
-// Só movimenta se NÃO estiver em diálogo
-if (!dialogue.active) {
-
-    if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT]) {
-
-        x += speed;
-        direction = 1;
-        moving = true;
-    }
-
-    if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT]) {
-
-        x -= speed;
-        direction = -1;
-        moving = true;
-    }
-}
-
-                    playerBox.w = frameW * scale;
-                    playerBox.h = frameH * scale;
-                    playerBox.x = x;
-                    playerBox.y = y;
-
-                    limitaBordasTela(&playerBox, screenW, screenH);
-
-                    x = playerBox.x;
-                    y = playerBox.y;
-
-                    if (moving) {
-                        frameTimer++;
-                        if (frameTimer >= frameDelay) {
-                            frameTimer = 0;
-                            currentFrame++;
-
-                            if (currentFrame >= maxFrames)
-                                currentFrame = 0;
-                        }
-                    } else {
-                        currentFrame = 0;
-                    }
-                }
-
-                redraw = true;
-                break;
             }
 
-            case ALLEGRO_EVENT_KEY_DOWN:
+            if (gameState == STATE_GAME)
+            {
 
-    keys[event.keyboard.keycode] = true;
+                // CONTADOR DE TEMPO DE JOGO
 
-    if (event.keyboard.keycode == ALLEGRO_KEY_F5) {
+                timeCounter++;
 
-        saveGame("save.bin",
-                 x,
-                 y,
-                 direction,
-                 currentFrame,
-                 gameState,
-                 &dialogue);
-    }
+                if (timeCounter >= 60)
+                {
+                    playTime++;
+                    timeCounter = 0;
+                }
 
-    if (event.keyboard.keycode == ALLEGRO_KEY_F9) {
+                // TROCA FRAME PELO DIÁLOGO
 
-        loadGame("save.bin",
-                 &x,
-                 &y,
-                 &direction,
-                 &currentFrame,
-                 &gameState,
-                 &dialogue);
+                if (dialogue.current >= 5)
+                    introFrame = 0;
 
-    adicionarScore("Player", playTime);
-    }
-    
-    if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
+                else if (dialogue.current >= 3)
+                    introFrame = 1;
 
-        adicionarScore("Player", playTime);
-                 running = false;
-    }
+                else if (dialogue.current >= 2)
+                    introFrame = 2;
 
-    break;
+                else
+                    introFrame = 3;
 
-            case ALLEGRO_EVENT_KEY_UP:
-                keys[event.keyboard.keycode] = false;
+                // Animação da caixa de diálogo
 
-                if (event.keyboard.keycode == ALLEGRO_KEY_ENTER)
-                    enterPressed = false;
+                if (dialogue.active)
+                {
 
-                break;
+                    dialogue.typeTimer++;
+
+                    if (dialogue.typeTimer >= dialogue.typeSpeed)
+                    {
+                        dialogue.typeTimer = 0;
+
+                        const char *currentText = getDialogue(&dialogue);
+                        int len = strlen(currentText);
+
+                        if (dialogue.charIndex < len)
+                            dialogue.charIndex++;
+                    }
+                }
+
+                // Ação de pular o dialogo
+
+                if (dialogue.active &&
+                    keys[ALLEGRO_KEY_ENTER] &&
+                    !enterPressed)
+                {
+
+                    enterPressed = true;
+
+                    const char *currentText = getDialogue(&dialogue);
+                    int len = strlen(currentText);
+
+                    if (dialogue.charIndex < len)
+                    {
+                        dialogue.charIndex = len;
+                    }
+                    else
+                    {
+                        nextDialogue(&dialogue);
+                    }
+                }
+
+                // MOVIMENTAÇÃO
+
+                bool moving = false;
+
+                // Só movimenta se NÃO estiver em diálogo
+                if (!dialogue.active)
+                {
+
+                    if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT])
+                    {
+
+                        x += speed;
+                        direction = 1;
+                        moving = true;
+                    }
+
+                    if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT])
+                    {
+
+                        x -= speed;
+                        direction = -1;
+                        moving = true;
+                    }
+                }
+
+                playerBox.w = frameW * scale;
+                playerBox.h = frameH * scale;
+                playerBox.x = x;
+                playerBox.y = y;
+
+                limitaBordasTela(&playerBox, screenW, screenH);
+
+                x = playerBox.x;
+                y = playerBox.y;
+
+                if (moving)
+                {
+                    frameTimer++;
+                    if (frameTimer >= frameDelay)
+                    {
+                        frameTimer = 0;
+                        currentFrame++;
+
+                        if (currentFrame >= maxFrames)
+                            currentFrame = 0;
+                    }
+                }
+                else
+                {
+                    currentFrame = 0;
+                }
+            }
+
+            redraw = true;
+            break;
         }
 
-        if (redraw && al_is_event_queue_empty(queue)) {
+        case ALLEGRO_EVENT_KEY_DOWN:
+
+            keys[event.keyboard.keycode] = true;
+
+            if (event.keyboard.keycode == ALLEGRO_KEY_F5)
+            {
+
+                saveGame("save.bin",
+                         x,
+                         y,
+                         direction,
+                         currentFrame,
+                         gameState,
+                         &dialogue);
+            }
+
+            if (event.keyboard.keycode == ALLEGRO_KEY_F9)
+            {
+
+                loadGame("save.bin",
+                         &x,
+                         &y,
+                         &direction,
+                         &currentFrame,
+                         &gameState,
+                         &dialogue);
+
+                adicionarScore("Player", playTime);
+            }
+
+            if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+            {
+
+                adicionarScore("Player", playTime);
+                running = false;
+            }
+
+            break;
+
+        case ALLEGRO_EVENT_KEY_UP:
+            keys[event.keyboard.keycode] = false;
+
+            if (event.keyboard.keycode == ALLEGRO_KEY_ENTER)
+                enterPressed = false;
+
+            break;
+        }
+
+        if (redraw && al_is_event_queue_empty(queue))
+        {
 
             redraw = false;
             al_clear_to_color(al_map_rgb(0, 0, 0));
 
-          //Menu
+            // Menu
 
-            if (gameState == STATE_MENU) {
-
-                al_draw_text(font,
-                    al_map_rgb(255,255,255),
-                    screenW/2, 300,
-                    ALLEGRO_ALIGN_CENTER,
-                    "CLUBE DA PEA");
+            if (gameState == STATE_MENU)
+            {
 
                 al_draw_text(font,
-                    al_map_rgb(255,255,255),
-                    screenW/2, 400,
-                    ALLEGRO_ALIGN_CENTER,
-                    selected == 0 ? "> Começar" : "Começar");
+                             al_map_rgb(255, 255, 255),
+                             screenW / 2, 300,
+                             ALLEGRO_ALIGN_CENTER,
+                             "CLUBE DA PEA");
 
                 al_draw_text(font,
-                    al_map_rgb(255,255,255),
-                    screenW/2, 450,
-                    ALLEGRO_ALIGN_CENTER,
-                    selected == 1 ? "> Sair" : "Sair");
+                             al_map_rgb(255, 255, 255),
+                             screenW / 2, 400,
+                             ALLEGRO_ALIGN_CENTER,
+                             selected == 0 ? "> Começar" : "Começar");
 
-                    for (int i = 0; i < rankingCount && i < 5; i++) {
+                al_draw_text(font,
+                             al_map_rgb(255, 255, 255),
+                             screenW / 2, 450,
+                             ALLEGRO_ALIGN_CENTER,
+                             selected == 1 ? "> Sair" : "Sair");
+
+                for (int i = 0; i < rankingCount && i < 5; i++)
+                {
 
                     char buffer[64];
 
                     sprintf(buffer, "%d. %s - %02d:%02d",
-                    i + 1,
-                    ranking[i].nome,
-                    ranking[i].tempo / 60,
-                    ranking[i].tempo % 60);
+                            i + 1,
+                            ranking[i].nome,
+                            ranking[i].tempo / 60,
+                            ranking[i].tempo % 60);
 
-                     al_draw_text(font,
-                     al_map_rgb(255,255,255),
-                     900,
-                      100 + i * 30,
-                     0,
-                    buffer);
-                    }
+                    al_draw_text(font,
+                                 al_map_rgb(255, 255, 255),
+                                 900,
+                                 100 + i * 30,
+                                 0,
+                                 buffer);
+                }
             }
-            
+
             // Jogo
-            
-            if (gameState == STATE_GAME) {
+
+            if (gameState == STATE_GAME)
+            {
 
                 drawMap(&mapa);
 
@@ -615,63 +671,62 @@ if (!dialogue.active) {
 
                 float scaleX = (direction == -1) ? -scale : scale;
 
+                // PLAYER NORMAL
 
-// PLAYER NORMAL
+                if (!dialogue.active)
+                {
 
-if (!dialogue.active) {
+                    al_draw_tinted_scaled_rotated_bitmap_region(
+                        player,
+                        frameX, frameY,
+                        frameW, frameH,
+                        al_map_rgb(255, 255, 255),
+                        centerX, centerY,
+                        x, y,
+                        scaleX, scale,
+                        0, 0);
+                }
 
-    al_draw_tinted_scaled_rotated_bitmap_region(
-        player,
-        frameX, frameY,
-        frameW, frameH,
-        al_map_rgb(255,255,255),
-        centerX, centerY,
-        x, y,
-        scaleX, scale,
-        0, 0
-    );
-}
+                // AVATAR INTRO DURANTE FALA
 
-// AVATAR INTRO DURANTE FALA
+                if (dialogue.active)
+                {
 
-if (dialogue.active) {
+                    int introX =
+                        (introFrame % introColumns) * introFrameW;
 
-    int introX =
-        (introFrame % introColumns)
-        * introFrameW;
+                    int introY =
+                        (introFrame / introColumns) * introFrameH;
 
-    int introY =
-        (introFrame / introColumns)
-        * introFrameH;
+                    al_draw_tinted_scaled_rotated_bitmap_region(
+                        avatarIntro,
+                        introX,
+                        introY,
+                        introFrameW,
+                        introFrameH,
+                        al_map_rgb(255, 255, 255),
+                        introFrameW / 2.0,
+                        introFrameH / 2.0,
+                        x,
+                        y,
+                        scaleX,
+                        scale,
+                        0,
+                        0);
+                }
 
-    al_draw_tinted_scaled_rotated_bitmap_region(
-        avatarIntro,
-        introX,
-        introY,
-        introFrameW,
-        introFrameH,
-        al_map_rgb(255,255,255),
-        introFrameW / 2.0,
-        introFrameH / 2.0,
-        x,
-        y,
-        scaleX,
-        scale,
-        0,
-        0
-    );
-}
-                
-                //Caixa de diálogo
-                
-                if (dialogue.active) {
+                // Caixa de diálogo
+
+                if (dialogue.active)
+                {
 
                     const char *full = getDialogue(&dialogue);
 
                     char buffer[256];
                     int len = dialogue.charIndex;
 
-                    if (len > 255) len = 255;
+                    if (len > 255)
+                        len = 255;
 
                     strncpy(buffer, full, len);
                     buffer[len] = '\0';
@@ -679,8 +734,7 @@ if (dialogue.active) {
                     al_draw_filled_rectangle(
                         0, screenH - 200,
                         screenW, screenH,
-                        al_map_rgba(0, 0, 0, 180)
-                    );
+                        al_map_rgba(0, 0, 0, 180));
 
                     // AVATAR
                     al_draw_scaled_bitmap(
@@ -690,32 +744,29 @@ if (dialogue.active) {
                         al_get_bitmap_height(dialogue.avatar),
                         40, screenH - 180,
                         200, 200,
-                        0
-                    );
+                        0);
 
                     // TEXTO
                     al_draw_text(font,
-                        al_map_rgb(255,255,255),
-                        screenW/2,
-                        screenH - 150,
-                        ALLEGRO_ALIGN_CENTER,
-                        buffer
-                    );
+                                 al_map_rgb(255, 255, 255),
+                                 screenW / 2,
+                                 screenH - 150,
+                                 ALLEGRO_ALIGN_CENTER,
+                                 buffer);
 
                     al_draw_text(font,
-                        al_map_rgb(150,150,150),
-                        screenW/2,
-                        screenH - 80,
-                        ALLEGRO_ALIGN_CENTER,
-                        "ENTER para avançar"
-                    );
+                                 al_map_rgb(150, 150, 150),
+                                 screenW / 2,
+                                 screenH - 80,
+                                 ALLEGRO_ALIGN_CENTER,
+                                 "ENTER para avançar");
                 }
             }
 
             al_flip_display();
         }
     }
-   
+
     // Limpeza
     al_destroy_font(font);
     destroyMap(&mapa);
@@ -726,10 +777,11 @@ if (dialogue.active) {
     al_destroy_event_queue(queue);
     al_destroy_display(display);
 
-    for (int i = 0; i < dialogue.count; i++) {
+    for (int i = 0; i < dialogue.count; i++)
+    {
 
-    if (dialogue.lines[i])
-        free(dialogue.lines[i]);
-}
+        if (dialogue.lines[i])
+            free(dialogue.lines[i]);
+    }
     return 0;
 }

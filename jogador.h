@@ -4,7 +4,8 @@
 #include <allegro5/allegro.h>
 #include "colisao.h"
 
-typedef struct {
+typedef struct
+{
 
     float x;
     float y;

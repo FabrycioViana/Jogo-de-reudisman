@@ -4,7 +4,8 @@
 #include <allegro5/allegro.h>
 #include <stdbool.h>
 
-typedef struct {
+typedef struct
+{
 
     ALLEGRO_BITMAP *background;
 
@@ -19,7 +20,7 @@ void drawMap(Mapa *mapa);
 
 void destroyMap(Mapa *mapa);
 
-//busca linear para os mapas
+// busca linear para os mapas
 int buscarMapa(int mapaAtual, int total);
 
 #endif

@@ -3,7 +3,8 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 
-void initPlayer(Player *p, ALLEGRO_BITMAP *sprite) {
+void initPlayer(Player *p, ALLEGRO_BITMAP *sprite)
+{
 
     int w = al_get_bitmap_width(sprite);
     int h = al_get_bitmap_height(sprite);
@@ -25,36 +26,42 @@ void initPlayer(Player *p, ALLEGRO_BITMAP *sprite) {
     p->maxFrames = 4;
 }
 
-void updatePlayer(Player *p, bool *keys, int screenW, int screenH) {
+void updatePlayer(Player *p, bool *keys, int screenW, int screenH)
+{
 
     bool moving = false;
 
-    if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT]) {
+    if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT])
+    {
         p->x += p->speed;
         p->direction = 1;
         moving = true;
     }
 
-    if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT]) {
+    if (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_LEFT])
+    {
         p->x -= p->speed;
         p->direction = -1;
         moving = true;
     }
 
     // animação
-    if (moving) {
+    if (moving)
+    {
 
         p->frameTimer++;
 
-        if (p->frameTimer >= p->frameDelay) {
+        if (p->frameTimer >= p->frameDelay)
+        {
             p->frameTimer = 0;
             p->currentFrame++;
 
             if (p->currentFrame >= p->maxFrames)
                 p->currentFrame = 0;
         }
-
-    } else {
+    }
+    else
+    {
         p->currentFrame = 0;
     }
 
@@ -72,7 +79,8 @@ void updatePlayer(Player *p, bool *keys, int screenW, int screenH) {
     p->y = p->box.y;
 }
 
-void drawPlayer(Player *p, ALLEGRO_BITMAP *sprite) {
+void drawPlayer(Player *p, ALLEGRO_BITMAP *sprite)
+{
 
     int frameX = (p->currentFrame % 2) * p->frameW;
     int frameY = (p->currentFrame / 2) * p->frameH;
@@ -99,6 +107,5 @@ void drawPlayer(Player *p, ALLEGRO_BITMAP *sprite) {
         scaleX,
         p->scale,
         0,
-        0
-    );
+        0);
 }
