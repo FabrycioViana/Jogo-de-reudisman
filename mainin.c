@@ -43,6 +43,16 @@ typedef struct {
     bool dialogueActive;
 } SaveData;
 
+typedef struct {
+    char nome[20];
+    int tempo;
+} Score;
+
+#define MAX_RANK 10
+
+Score ranking[MAX_RANK];
+int rankingCount = 0;
+
 void addDialogue(Dialogue *d, const char *text) {
 
     if (d->count >= MAX_DIALOGUES)
@@ -188,6 +198,59 @@ void loadGame(const char *filename,
     printf("Jogo carregado!\n");
 }
 
+void ordenarRanking() {
+
+    for (int i = 0; i < rankingCount - 1; i++) {
+        for (int j = 0; j < rankingCount - i - 1; j++) {
+
+            if (ranking[j].tempo > ranking[j + 1].tempo) {
+
+                Score temp = ranking[j];
+                ranking[j] = ranking[j + 1];
+                ranking[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void salvarRanking() {
+
+    FILE *f = fopen("ranking.bin", "wb");
+    if (!f) return;
+
+    fwrite(&rankingCount, sizeof(int), 1, f);
+    fwrite(ranking, sizeof(Score), rankingCount, f);
+
+    fclose(f);
+}
+
+void carregarRanking() {
+
+    FILE *f = fopen("ranking.bin", "rb");
+    if (!f) return;
+
+    fread(&rankingCount, sizeof(int), 1, f);
+    fread(ranking, sizeof(Score), rankingCount, f);
+
+    fclose(f);
+
+    ordenarRanking();
+}
+
+void adicionarScore(const char *nome, int tempo) {
+
+    if (rankingCount < MAX_RANK) {
+
+        strcpy(ranking[rankingCount].nome, nome);
+        ranking[rankingCount].tempo = tempo;
+
+        rankingCount++;
+    }
+
+    ordenarRanking();
+    salvarRanking();
+}
+
 int main() {
 
     al_init();
@@ -196,7 +259,7 @@ int main() {
     al_init_image_addon();
     al_init_font_addon();
     al_init_ttf_addon();
-
+    carregarRanking();
     int screenW = 1280;
     int screenH = 720;
 
@@ -260,6 +323,9 @@ if (dialogue.count > 0) {
     float y = 700;
     float speed = 5.0;
     int direction = 1;
+    
+    int playTime = 0;
+    int timeCounter = 0;
 
     int sheetW = al_get_bitmap_width(player);
     int sheetH = al_get_bitmap_height(player);
@@ -332,6 +398,16 @@ int introFrame = 0;
                 }
 
                 if (gameState == STATE_GAME) {
+
+
+// ⏱️ CONTADOR DE TEMPO DE JOGO
+
+    timeCounter++;
+
+    if (timeCounter >= 60) {
+        playTime++;
+        timeCounter = 0;
+    }
 
 
 // TROCA FRAME PELO DIÁLOGO
@@ -458,6 +534,14 @@ if (!dialogue.active) {
                  &currentFrame,
                  &gameState,
                  &dialogue);
+
+    adicionarScore("Player", playTime);
+    }
+    
+    if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
+
+        adicionarScore("Player", playTime);
+                 running = false;
     }
 
     break;
@@ -497,6 +581,24 @@ if (!dialogue.active) {
                     screenW/2, 450,
                     ALLEGRO_ALIGN_CENTER,
                     selected == 1 ? "> Sair" : "Sair");
+
+                    for (int i = 0; i < rankingCount && i < 5; i++) {
+
+                    char buffer[64];
+
+                    sprintf(buffer, "%d. %s - %02d:%02d",
+                    i + 1,
+                    ranking[i].nome,
+                    ranking[i].tempo / 60,
+                    ranking[i].tempo % 60);
+
+                     al_draw_text(font,
+                     al_map_rgb(255,255,255),
+                     900,
+                      100 + i * 30,
+                     0,
+                    buffer);
+                    }
             }
             
             // Jogo
