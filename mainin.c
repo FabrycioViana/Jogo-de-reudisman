@@ -771,7 +771,7 @@ int main()
                         0, 0,
                         al_get_bitmap_width(dialogue.avatar),
                         al_get_bitmap_height(dialogue.avatar),
-                        40, screenH - 180,
+                        1000, screenH - 180,
                         200, 200,
                         0);
 
