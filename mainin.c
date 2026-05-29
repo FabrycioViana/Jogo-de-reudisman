@@ -639,7 +639,7 @@ int main()
                              ALLEGRO_ALIGN_CENTER,
                              selected == 1 ? "> Sair" : "Sair");
 
-                for (int i = 0; i < rankingCount && i < 5; i++)
+                for (int i = 0; i < rankingCount && i < 10; i++)
                 {
 
                     char buffer[64];
