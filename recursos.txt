@@ -1,0 +1,17 @@
+/*
+==================================================
+Recursos utilizados:
+
+- Sprites e backgrounds obtidos em:
+  https://craftpix.net
+
+- Alguns recursos gráficos foram adaptados e
+  modificados para atender às necessidades
+  do projeto.
+
+- Auxílio na organização
+  do código e adaptações dos recursos:
+  ChatGPT (OpenAI)
+
+==================================================
+*/
