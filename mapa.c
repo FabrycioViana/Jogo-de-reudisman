@@ -45,12 +45,28 @@ void destroyMap(Mapa *mapa)
 
 int buscarMapaPorID(InfoMapa mapas[],
                     int total,
-                    int id) {
+                    int id)
+{
+    int inicio = 0;
+    int fim = total - 1;
 
-    for (int i = 0; i < total; i++) {
+    while (inicio <= fim)
+    {
+        int meio = (inicio + fim) / 2;
 
-        if (mapas[i].id == id)
-            return i;
+        if (mapas[meio].id == id)
+        {
+            return meio;
+        }
+
+        if (id < mapas[meio].id)
+        {
+            fim = meio - 1;
+        }
+        else
+        {
+            inicio = meio + 1;
+        }
     }
 
     return -1;
