@@ -76,7 +76,7 @@ int main()
 
     // Mapa
     Mapa mapa;
-    if (!initMap(&mapa, "background1.png"))
+    if (!initMap(&mapa, "rio_fevereiro.png"))
     {
         printf("Erro ao carregar mapa!\n");
         return -1;
@@ -131,14 +131,15 @@ int main()
     float x = 100;
     float y = 570;
     float speed = 5.0;
+    float cameraX = 0;
     int direction = 1;
 
     int mapaAtual = 1;
 
     InfoMapa mapas[] = {
 
-        {1, "background1.png"},
-        {2, "background2.png"}};
+        {1, "rio_fevereiro.png"},
+        {2, "clubedapeia.png"}};
 
     int totalMapas = 2;
 
@@ -157,6 +158,13 @@ int main()
     float scale = 2.0;
 
     Rect playerBox;
+
+    Rect portaClube = {
+
+    2700,500,
+
+    150,180
+};
 
     int currentFrame = 0;
     int frameTimer = 0;
@@ -313,41 +321,47 @@ int main()
                 playerBox.x = x;
                 playerBox.y = y;
 
-                limitaBordasTela(&playerBox, screenW, screenH);
+                limitaBordasTela(&playerBox,mapa.width,screenH);
 
                 x = playerBox.x;
                 y = playerBox.y;
+                cameraX = x - screenW / 2;
 
-                // TROCA DE MAPA
+if (cameraX < 0)
+{
+    cameraX = 0;
+}
 
-                if (x >= screenW - frameW * scale)
-                {
+if (cameraX > mapa.width - screenW)
+{
+    cameraX = mapa.width - screenW;
+}
 
-                    mapaAtual++;
+if (mapaAtual == 1 &&
+    verificaColisao(playerBox, portaClube))
+{
+    if (keys[ALLEGRO_KEY_E])
+    {
+        mapaAtual = 2;
 
-                    if (mapaAtual > totalMapas)
-                        mapaAtual = 1;
+        int indice =
+            buscarMapaPorID(mapas,
+                            totalMapas,
+                            mapaAtual);
 
-                    int indice =
-                        buscarMapaPorID(mapas,
-                                        totalMapas,
-                                        mapaAtual);
+        if (indice != -1)
+        {
+            destroyMap(&mapa);
 
-                    if (indice != -1)
-                    {
+            initMap(&mapa,
+                    mapas[indice].arquivo);
 
-                        destroyMap(&mapa);
+            x = 100;
+            y = 570;
+        }
+    }
+}
 
-                        if (!initMap(&mapa,
-                                     mapas[indice].arquivo))
-                        {
-
-                            printf("Erro ao carregar novo mapa!\n");
-                        }
-
-                        x = 50;
-                    }
-                }
 
                 if (moving)
                 {
@@ -483,7 +497,7 @@ int main()
             if (gameState == STATE_GAME)
             {
 
-                drawMap(&mapa);
+                drawMap(&mapa, cameraX);
 
                 int frameX = (currentFrame % columns) * frameW;
                 int frameY = (currentFrame / columns) * frameH;
@@ -503,7 +517,7 @@ int main()
                         frameW, frameH,
                         al_map_rgb(255, 255, 255),
                         centerX, centerY,
-                        x, y,
+                        x - cameraX, y,
                         scaleX, scale,
                         0, 0);
                 }
@@ -527,7 +541,7 @@ int main()
                         al_map_rgb(255, 255, 255),
                         introFrameW / 2.0,
                         introFrameH / 2.0,
-                        x,
+                        x - cameraX,
                         y,
                         scaleX,
                         scale,
@@ -580,7 +594,7 @@ int main()
                                  ALLEGRO_ALIGN_CENTER,
                                  "ENTER para avançar");
 
-                    char pilhaInfo[64];
+                                 char pilhaInfo[64];
 
                     sprintf(pilhaInfo,
                             "Pilha: %d",
@@ -594,6 +608,8 @@ int main()
                                  pilhaInfo);
                 }
             }
+
+            
 
             al_flip_display();
         }
