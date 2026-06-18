@@ -18,6 +18,37 @@
 #define STATE_MENU 0
 #define STATE_GAME 1
 
+#define MAX_HISTORICO 100
+
+typedef struct
+{
+    int itens[MAX_HISTORICO];
+    int topo;
+} PilhaDialogo;
+
+void initPilha(PilhaDialogo *p)
+{
+    p->topo = -1;
+}
+
+void push(PilhaDialogo *p, int valor)
+{
+    if (p->topo < MAX_HISTORICO - 1)
+        p->itens[++p->topo] = valor;
+}
+
+int pop(PilhaDialogo *p)
+{
+    if (p->topo >= 0)
+        return p->itens[p->topo--];
+
+    return -1;
+}
+
+bool pilhaVazia(PilhaDialogo *p)
+{
+    return p->topo == -1;
+}
 
 int main()
 {
@@ -69,6 +100,8 @@ int main()
 
     // Dialogos
     Dialogue dialogue = {0};
+    PilhaDialogo historico;
+    initPilha(&historico);
     dialogue.avatar = avatar;
     loadDialoguesFromFile(&dialogue, "falaintroducao.txt");
     printf("Dialogos carregados: %d\n", dialogue.count);
@@ -246,6 +279,7 @@ int main()
                     }
                     else
                     {
+                        push(&historico, dialogue.current);
                         nextDialogue(&dialogue);
                     }
                 }
@@ -365,6 +399,18 @@ int main()
                          &dialogue);
 
                 adicionarScore("Player", playTime);
+            }
+
+            if (event.keyboard.keycode == ALLEGRO_KEY_BACKSPACE)
+            {
+                if (dialogue.active &&
+                    !pilhaVazia(&historico))
+                {
+                    dialogue.current = pop(&historico);
+
+                    dialogue.charIndex = 0;
+                    dialogue.typeTimer = 0;
+                }
             }
 
             if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
@@ -533,6 +579,19 @@ int main()
                                  screenH - 80,
                                  ALLEGRO_ALIGN_CENTER,
                                  "ENTER para avançar");
+
+                    char pilhaInfo[64];
+
+                    sprintf(pilhaInfo,
+                            "Pilha: %d",
+                            historico.topo + 1);
+
+                    al_draw_text(font,
+                                 al_map_rgb(255, 255, 0),
+                                 20,
+                                 20,
+                                 0,
+                                 pilhaInfo);
                 }
             }
 
