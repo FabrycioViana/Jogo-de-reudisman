@@ -15,26 +15,16 @@ bool initMap(Mapa *mapa, const char *path)
     return true;
 }
 
-void drawMap(Mapa *mapa)
+void drawMap(Mapa *mapa, float cameraX)
 {
-
-    al_draw_scaled_bitmap(
-
+    al_draw_bitmap_region(
         mapa->background,
 
-        0,
-        0,
-
-        mapa->width,
-        mapa->height,
-
-        0,
-        0,
+        cameraX,0,
 
         1280,
         720,
-
-        0);
+        0,0,0);
 }
 
 void destroyMap(Mapa *mapa)

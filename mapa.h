@@ -21,7 +21,7 @@ char arquivo[50];
 
 bool initMap(Mapa *mapa, const char *path);
 
-void drawMap(Mapa *mapa);
+void drawMap(Mapa *mapa, float cameraX);
 
 void destroyMap(Mapa *mapa);
 

@@ -83,7 +83,7 @@ int main()
 
     // Mapa
     Mapa mapa;
-    if (!initMap(&mapa, "background1.png"))
+    if (!initMap(&mapa, "rio_fevereiro.png"))
     {
         printf("Erro ao carregar mapa!\n");
         return -1;
@@ -158,12 +158,13 @@ int main()
     float x = 100;
     float y = 570;
     float speed = 5.0;
+    float cameraX = 0;
     int direction = 1;
 
     int mapaAtual = 1;
     InfoMapa mapas[] = {
-        {1, "background1.png"},
-        {2, "background2.png"}};
+        {1, "rio_fevereiro.png"},
+        {2, "clubedapeia.png"}};
     int totalMapas = 2;
 
     int playTime = 0;
@@ -177,6 +178,11 @@ int main()
     int frameH = sheetH / rows;
     float scale = 2.0;
     Rect playerBox;
+
+    Rect portaClube = {
+        2700, 500,
+        150, 180
+    };
 
     int currentFrame = 0;
     int frameTimer = 0;
@@ -308,23 +314,35 @@ int main()
                 playerBox.h = frameH * scale;
                 playerBox.x = x;
                 playerBox.y = y;
-                limitaBordasTela(&playerBox, screenW, screenH);
+
+                limitaBordasTela(&playerBox, mapa.width, screenH);
+
                 x = playerBox.x;
                 y = playerBox.y;
+                cameraX = x - screenW / 2;
 
-                if (x >= screenW - frameW * scale)
+                if (cameraX < 0)
+                    cameraX = 0;
+
+                if (cameraX > mapa.width - screenW)
+                    cameraX = mapa.width - screenW;
+
+                if (mapaAtual == 1 &&
+                    verificaColisao(playerBox, portaClube))
                 {
-                    mapaAtual++;
-                    if (mapaAtual > totalMapas)
-                        mapaAtual = 1;
-
-                    int indice = buscarMapaPorID(mapas, totalMapas, mapaAtual);
-                    if (indice != -1)
+                    if (keys[ALLEGRO_KEY_E])
                     {
-                        destroyMap(&mapa);
-                        if (!initMap(&mapa, mapas[indice].arquivo))
-                            printf("Erro ao carregar novo mapa!\n");
-                        x = 50;
+                        mapaAtual = 2;
+
+                        int indice = buscarMapaPorID(mapas, totalMapas, mapaAtual);
+
+                        if (indice != -1)
+                        {
+                            destroyMap(&mapa);
+                            initMap(&mapa, mapas[indice].arquivo);
+                            x = 100;
+                            y = 570;
+                        }
                     }
                 }
 
@@ -477,7 +495,7 @@ int main()
             // DESENHO DO JOGO
             if (gameState == STATE_GAME)
             {
-                drawMap(&mapa);
+                drawMap(&mapa, cameraX);
 
                 int frameX = (currentFrame % columns) * frameW;
                 int frameY = (currentFrame / columns) * frameH;
@@ -490,7 +508,9 @@ int main()
                     al_draw_tinted_scaled_rotated_bitmap_region(
                         player, frameX, frameY, frameW, frameH,
                         al_map_rgb(255, 255, 255),
-                        centerX, centerY, x, y, scaleX, scale, 0, 0);
+                        centerX, centerY,
+                        x - cameraX, y,
+                        scaleX, scale, 0, 0);
                 }
 
                 if (dialogue.active)
@@ -502,7 +522,8 @@ int main()
                         avatarIntro, introX, introY, introFrameW, introFrameH,
                         al_map_rgb(255, 255, 255),
                         introFrameW / 2.0, introFrameH / 2.0,
-                        x, y, scaleX, scale, 0, 0);
+                        x - cameraX, y,
+                        scaleX, scale, 0, 0);
                 }
 
                 if (dialogue.active)
@@ -580,7 +601,6 @@ int main()
             }
 
             // CRÉDITOS
-
             if (gameState == STATE_CREDITOS)
             {
                 al_draw_scaled_bitmap(menuBg, 0, 0,
@@ -598,25 +618,23 @@ int main()
                              ALLEGRO_ALIGN_CENTER, "Desenvolvimento");
 
                 // nomes dos integrantes
-                
                 al_draw_filled_circle(screenW / 2 - 80, 200 + 4, 5, al_map_rgb(0, 255, 255));
-                al_draw_text(font, al_map_rgb(200, 255, 200), screenW / 2 - 68, 200, 0, "Fabrycio Viana");
+                al_draw_text(font, al_map_rgb(0, 255, 255), screenW / 2 - 68, 200, 0, "Fabrycio Viana");
 
                 al_draw_filled_circle(screenW / 2 - 80, 230 + 4, 5, al_map_rgb(142, 69, 133));
-                al_draw_text(font, al_map_rgb(200, 200, 200), screenW / 2 - 68, 230, 0, "Isabel Alves");
+                al_draw_text(font, al_map_rgb(142, 69, 133), screenW / 2 - 68, 230, 0, "Isabel Alves");
 
                 al_draw_filled_circle(screenW / 2 - 80, 260 + 4, 5, al_map_rgb(0, 255, 0));
-                al_draw_text(font, al_map_rgb(200, 200, 200), screenW / 2 - 68, 260, 0, "José Daniel");
+                al_draw_text(font, al_map_rgb(0, 255, 0), screenW / 2 - 68, 260, 0, "José Daniel");
 
                 al_draw_filled_circle(screenW / 2 - 80, 290 + 4, 5, al_map_rgb(255, 0, 0));
-                al_draw_text(font, al_map_rgb(200, 200, 200), screenW / 2 - 68, 290, 0, "Kamily Fernandes");
+                al_draw_text(font, al_map_rgb(255, 0, 0), screenW / 2 - 68, 290, 0, "Kamily Fernandes");
 
                 // seção de arte
                 al_draw_text(font, al_map_rgb(255, 255, 255),
                              screenW / 2, 320,
                              ALLEGRO_ALIGN_CENTER, "Arte");
 
-                // seção de arte
                 al_draw_text(font, al_map_rgb(200, 200, 200),
                              screenW / 2, 350,
                              ALLEGRO_ALIGN_CENTER, "Nome do artista");
