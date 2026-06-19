@@ -18,7 +18,6 @@
 #define STATE_MENU 0
 #define STATE_GAME 1
 #define STATE_RANKING 2
-// NOVO: estado para tela de créditos
 #define STATE_CREDITOS 3
 
 typedef enum
@@ -124,7 +123,7 @@ int main()
     int logoW = al_get_bitmap_width(logo);
     int logoH = al_get_bitmap_height(logo);
 
-    // Dialogos
+    // DIÁLOGOS - PRIMEIRA CUTSCENE
     Dialogue dialogue = {0};
     PilhaDialogo historico;
     initPilha(&historico);
@@ -136,6 +135,61 @@ int main()
         startDialogue(&dialogue);
     else
         printf("Nenhum dialogo carregado!\n");
+
+    // SEGUNDA CUTSCENE
+    Dialogue cutscene2 = {0};
+    PilhaDialogo historico2;
+    initPilha(&historico2);
+
+    cutscene2.avatar = avatar;
+    loadDialoguesFromFile(&cutscene2, "falasegundact.txt");
+    printf("Dialogos da cutscene 2 carregados: %d\n", cutscene2.count);
+
+    ALLEGRO_BITMAP *avatarCarate = al_load_bitmap("avatarcarate.png");
+    if (!avatarCarate)
+    {
+        printf("Erro ao carregar avatarcarate.png!\n");
+        return -1;
+    }
+
+    // PERSONAGEM TREINADOR
+    ALLEGRO_BITMAP *treinador = al_load_bitmap("treinador.png");
+    if (!treinador)
+    {
+        printf("Erro ao carregar treinador.png!\n");
+        return -1;
+    }
+
+    // lista dos nomes de personagem usado nas tags [NOME] do .txt
+    SpeakerAvatar avatares[] = {
+        {"RUIVO", avatar},
+        {"TREINADOR", avatarCarate}};
+    int totalAvatares = 2;
+
+    // sprite sheet do treinador
+    int treinadorSheetW = al_get_bitmap_width(treinador);
+    int treinadorSheetH = al_get_bitmap_height(treinador);
+    int treinadorColumns = 8;
+    int treinadorRows = 1;
+    int treinadorFrameW = treinadorSheetW / treinadorColumns;
+    int treinadorFrameH = treinadorSheetH / treinadorRows;
+
+    // Dados do treinador
+
+    float treinadorX = mapa.width * 0.8f;
+    float treinadorY = 570;
+    int treinadorFrame = 0;
+    int treinadorDirection = -1;
+
+    // escala própria do treinador
+    float treinadorScale = 1.2f;
+
+    // caixa de colisão do treinador.
+    Rect treinadorBox = {
+        treinadorX, treinadorY,
+        treinadorFrameW * treinadorScale, treinadorFrameH * treinadorScale};
+
+    bool cutscene2Ativada = false;
 
     // Inputs
     al_register_event_source(queue, al_get_display_event_source(display));
@@ -181,8 +235,7 @@ int main()
 
     Rect portaClube = {
         2700, 500,
-        150, 180
-    };
+        150, 180};
 
     int currentFrame = 0;
     int frameTimer = 0;
@@ -236,7 +289,6 @@ int main()
                         fadeTarget = STATE_RANKING;
                         fadeState = FADE_OUT;
                     }
-                    // NOVO: opção créditos
                     else if (selected == 2)
                     {
                         fadeTarget = STATE_CREDITOS;
@@ -257,17 +309,20 @@ int main()
                     timeCounter = 0;
                 }
 
-                if (dialogue.current >= 5)
-                    introFrame = 0;
-                else if (dialogue.current >= 3)
-                    introFrame = 1;
-                else if (dialogue.current >= 2)
-                    introFrame = 2;
-                else
-                    introFrame = 3;
+                // LÓGICA DE DIÁLOGOS
+                bool dialogoAtivo = dialogue.active || cutscene2.active;
 
                 if (dialogue.active)
                 {
+                    if (dialogue.current >= 5)
+                        introFrame = 0;
+                    else if (dialogue.current >= 3)
+                        introFrame = 1;
+                    else if (dialogue.current >= 2)
+                        introFrame = 2;
+                    else
+                        introFrame = 3;
+
                     dialogue.typeTimer++;
                     if (dialogue.typeTimer >= dialogue.typeSpeed)
                     {
@@ -277,24 +332,69 @@ int main()
                         if (dialogue.charIndex < len)
                             dialogue.charIndex++;
                     }
-                }
 
-                if (dialogue.active && keys[ALLEGRO_KEY_ENTER] && !enterPressed)
-                {
-                    enterPressed = true;
-                    const char *currentText = getDialogue(&dialogue);
-                    int len = strlen(currentText);
-                    if (dialogue.charIndex < len)
-                        dialogue.charIndex = len;
-                    else
+                    if (keys[ALLEGRO_KEY_ENTER] && !enterPressed)
                     {
-                        push(&historico, dialogue.current);
-                        nextDialogue(&dialogue);
+                        enterPressed = true;
+                        const char *currentText = getDialogue(&dialogue);
+                        int len = strlen(currentText);
+                        if (dialogue.charIndex < len)
+                            dialogue.charIndex = len;
+                        else
+                        {
+                            push(&historico, dialogue.current);
+                            nextDialogue(&dialogue);
+                        }
                     }
                 }
 
+                // LÓGICA DA SEGUNDA CUTSCENE
+                if (cutscene2.active)
+                {
+
+                    treinadorFrame = 4;
+
+                    if (cutscene2.current >= 5)
+                        introFrame = 0;
+                    else if (cutscene2.current >= 3)
+                        introFrame = 1;
+                    else if (cutscene2.current >= 2)
+                        introFrame = 2;
+                    else
+                        introFrame = 3;
+
+                    cutscene2.typeTimer++;
+                    if (cutscene2.typeTimer >= cutscene2.typeSpeed)
+                    {
+                        cutscene2.typeTimer = 0;
+                        const char *currentText = getDialogue(&cutscene2);
+                        int len = strlen(currentText);
+                        if (cutscene2.charIndex < len)
+                            cutscene2.charIndex++;
+                    }
+
+                    if (keys[ALLEGRO_KEY_ENTER] && !enterPressed)
+                    {
+                        enterPressed = true;
+                        const char *currentText = getDialogue(&cutscene2);
+                        int len = strlen(currentText);
+                        if (cutscene2.charIndex < len)
+                            cutscene2.charIndex = len;
+                        else
+                        {
+                            push(&historico2, cutscene2.current);
+                            nextDialogue(&cutscene2);
+                        }
+                    }
+                }
+                else if (mapaAtual == 2)
+                {
+
+                    treinadorFrame = 0;
+                }
+
                 bool moving = false;
-                if (!dialogue.active)
+                if (!dialogoAtivo)
                 {
                     if (keys[ALLEGRO_KEY_D] || keys[ALLEGRO_KEY_RIGHT])
                     {
@@ -316,6 +416,16 @@ int main()
                 playerBox.y = y;
 
                 limitaBordasTela(&playerBox, mapa.width, screenH);
+
+                if (mapaAtual == 2 &&
+                    verificaColisao(playerBox, treinadorBox))
+                {
+
+                    if (playerBox.x < treinadorBox.x)
+                        playerBox.x = treinadorBox.x - playerBox.w;
+                    else
+                        playerBox.x = treinadorBox.x + treinadorBox.w;
+                }
 
                 x = playerBox.x;
                 y = playerBox.y;
@@ -342,6 +452,19 @@ int main()
                             initMap(&mapa, mapas[indice].arquivo);
                             x = 100;
                             y = 570;
+
+                            treinadorX = mapa.width * 0.8f;
+                            treinadorBox.x = treinadorX;
+                            treinadorBox.y = treinadorY;
+                            treinadorBox.w = treinadorFrameW * treinadorScale;
+                            treinadorBox.h = treinadorFrameH * treinadorScale;
+
+                            // ATIVA A SEGUNDA CUTSCENE AO ENTRAR NO MAPA 2
+                            if (!cutscene2Ativada && cutscene2.count > 0)
+                            {
+                                startDialogue(&cutscene2);
+                                cutscene2Ativada = true;
+                            }
                         }
                     }
                 }
@@ -397,12 +520,10 @@ int main()
             {
                 if (event.keyboard.keycode == ALLEGRO_KEY_UP ||
                     event.keyboard.keycode == ALLEGRO_KEY_W)
-                    // NOVO: % 4 pois agora são 4 opções
                     selected = (selected - 1 + 4) % 4;
 
                 if (event.keyboard.keycode == ALLEGRO_KEY_DOWN ||
                     event.keyboard.keycode == ALLEGRO_KEY_S)
-                    // NOVO: % 4 pois agora são 4 opções
                     selected = (selected + 1) % 4;
             }
 
@@ -424,7 +545,6 @@ int main()
                     fadeTarget = STATE_MENU;
                     fadeState = FADE_OUT;
                 }
-                // NOVO: backspace nos créditos também volta ao menu
                 else if (gameState == STATE_CREDITOS)
                 {
                     fadeTarget = STATE_MENU;
@@ -435,6 +555,12 @@ int main()
                     dialogue.current = pop(&historico);
                     dialogue.charIndex = 0;
                     dialogue.typeTimer = 0;
+                }
+                else if (cutscene2.active && !pilhaVazia(&historico2))
+                {
+                    cutscene2.current = pop(&historico2);
+                    cutscene2.charIndex = 0;
+                    cutscene2.typeTimer = 0;
                 }
             }
 
@@ -483,11 +609,9 @@ int main()
                 al_draw_text(font, al_map_rgb(255, 255, 255), screenW / 2, 440,
                              ALLEGRO_ALIGN_CENTER, selected == 1 ? "> Ranking" : "Ranking");
 
-                // NOVO: opção créditos no menu
                 al_draw_text(font, al_map_rgb(255, 255, 255), screenW / 2, 480,
                              ALLEGRO_ALIGN_CENTER, selected == 2 ? "> Créditos" : "Créditos");
 
-                // NOVO: sair agora é o índice 3
                 al_draw_text(font, al_map_rgb(255, 255, 255), screenW / 2, 520,
                              ALLEGRO_ALIGN_CENTER, selected == 3 ? "> Sair" : "Sair");
             }
@@ -496,6 +620,22 @@ int main()
             if (gameState == STATE_GAME)
             {
                 drawMap(&mapa, cameraX);
+
+                if (mapaAtual == 2)
+                {
+                    int treinadorFrameX = (treinadorFrame % treinadorColumns) * treinadorFrameW;
+                    int treinadorFrameY = (treinadorFrame / treinadorColumns) * treinadorFrameH;
+                    float treinadorCenterX = treinadorFrameW / 2.0;
+                    float treinadorCenterY = treinadorFrameH / 2.0;
+                    float treinadorScaleX = (treinadorDirection == -1) ? -treinadorScale : treinadorScale;
+
+                    al_draw_tinted_scaled_rotated_bitmap_region(
+                        treinador, treinadorFrameX, treinadorFrameY, treinadorFrameW, treinadorFrameH,
+                        al_map_rgb(255, 255, 255),
+                        treinadorCenterX, treinadorCenterY,
+                        treinadorX - cameraX, treinadorY,
+                        treinadorScaleX, (treinadorScaleX < 0) ? -treinadorScaleX : treinadorScaleX, 0, 0);
+                }
 
                 int frameX = (currentFrame % columns) * frameW;
                 int frameY = (currentFrame / columns) * frameH;
@@ -513,6 +653,7 @@ int main()
                         scaleX, scale, 0, 0);
                 }
 
+                // RENDERIZAÇÃO DE DIÁLOGOS
                 if (dialogue.active)
                 {
                     int introX = (introFrame % introColumns) * introFrameW;
@@ -524,10 +665,7 @@ int main()
                         introFrameW / 2.0, introFrameH / 2.0,
                         x - cameraX, y,
                         scaleX, scale, 0, 0);
-                }
 
-                if (dialogue.active)
-                {
                     const char *full = getDialogue(&dialogue);
                     char buffer[256];
                     int len = dialogue.charIndex;
@@ -553,6 +691,47 @@ int main()
 
                     char pilhaInfo[64];
                     sprintf(pilhaInfo, "Pilha: %d", historico.topo + 1);
+                    al_draw_text(font, al_map_rgb(255, 255, 0), 20, 20, 0, pilhaInfo);
+                }
+
+                //  RENDERIZAÇÃO DA SEGUNDA CUTSCENE (DIÁLOGO)
+                if (cutscene2.active)
+                {
+                    const char *full = getDialogue(&cutscene2);
+                    char buffer[256];
+                    int len = cutscene2.charIndex;
+                    if (len > 255)
+                        len = 255;
+                    strncpy(buffer, full, len);
+                    buffer[len] = '\0';
+
+                    al_draw_filled_rectangle(0, screenH - 100, screenW, screenH,
+                                             al_map_rgba(0, 0, 0, 180));
+
+                    // NOVOfala a linha atual (lido da tag [NOME] do .txt)
+
+                    const char *speakerAtual = getSpeaker(&cutscene2);
+                    ALLEGRO_BITMAP *avatarAtual = getAvatarBySpeaker(avatares, totalAvatares, speakerAtual);
+
+                    // fallback: se a tag não existir ou não bater com nenhum nome
+                    // usa o avatar padrão pra não quebrar o desenho
+                    if (!avatarAtual)
+                        avatarAtual = avatar;
+
+                    al_draw_scaled_bitmap(avatarAtual, 0, 0,
+                                          al_get_bitmap_width(avatarAtual),
+                                          al_get_bitmap_height(avatarAtual),
+                                          1000, screenH - 180, 200, 200, 0);
+
+                    al_draw_text(font, al_map_rgb(255, 255, 255),
+                                 screenW / 2, screenH - 35, ALLEGRO_ALIGN_CENTER, buffer);
+
+                    al_draw_text(font, al_map_rgb(150, 150, 150),
+                                 screenW / 2, screenH - 80, ALLEGRO_ALIGN_CENTER,
+                                 "ENTER para avançar");
+
+                    char pilhaInfo[64];
+                    sprintf(pilhaInfo, "Pilha: %d", historico2.topo + 1);
                     al_draw_text(font, al_map_rgb(255, 255, 0), 20, 20, 0, pilhaInfo);
                 }
             }
@@ -612,25 +791,22 @@ int main()
                              screenW / 2, 80,
                              ALLEGRO_ALIGN_CENTER, " CRÉDITOS ");
 
-                // seção de desenvolvimento
                 al_draw_text(font, al_map_rgb(255, 255, 255),
                              screenW / 2, 170,
                              ALLEGRO_ALIGN_CENTER, "Desenvolvimento");
 
-                // nomes dos integrantes
                 al_draw_filled_circle(screenW / 2 - 80, 200 + 4, 5, al_map_rgb(0, 255, 255));
-                al_draw_text(font, al_map_rgb(0, 255, 255), screenW / 2 - 68, 200, 0, "Fabrycio Viana");
+                al_draw_text(font, al_map_rgb(200, 200, 200), screenW / 2 - 68, 200, 0, "Fabrycio Viana");
 
                 al_draw_filled_circle(screenW / 2 - 80, 230 + 4, 5, al_map_rgb(142, 69, 133));
-                al_draw_text(font, al_map_rgb(142, 69, 133), screenW / 2 - 68, 230, 0, "Isabel Alves");
+                al_draw_text(font, al_map_rgb(200, 200, 200), screenW / 2 - 68, 230, 0, "Isabel Alves");
 
                 al_draw_filled_circle(screenW / 2 - 80, 260 + 4, 5, al_map_rgb(0, 255, 0));
-                al_draw_text(font, al_map_rgb(0, 255, 0), screenW / 2 - 68, 260, 0, "José Daniel");
+                al_draw_text(font, al_map_rgb(200, 200, 200), screenW / 2 - 68, 260, 0, "José Daniel");
 
                 al_draw_filled_circle(screenW / 2 - 80, 290 + 4, 5, al_map_rgb(255, 0, 0));
-                al_draw_text(font, al_map_rgb(255, 0, 0), screenW / 2 - 68, 290, 0, "Kamily Fernandes");
+                al_draw_text(font, al_map_rgb(200, 200, 200), screenW / 2 - 68, 290, 0, "Kamily Fernandes");
 
-                // seção de arte
                 al_draw_text(font, al_map_rgb(255, 255, 255),
                              screenW / 2, 320,
                              ALLEGRO_ALIGN_CENTER, "Arte");
@@ -639,12 +815,10 @@ int main()
                              screenW / 2, 350,
                              ALLEGRO_ALIGN_CENTER, "Nome do artista");
 
-                // seção de ferramentas
                 al_draw_text(font, al_map_rgb(255, 255, 255),
                              screenW / 2, 380,
                              ALLEGRO_ALIGN_CENTER, "Ferramentas");
 
-                // ferramentas usadas no projeto
                 al_draw_text(font, al_map_rgb(200, 200, 200),
                              screenW / 2, 410,
                              ALLEGRO_ALIGN_CENTER, "Allegro 5 | Linguagem C");
@@ -678,9 +852,11 @@ int main()
     al_destroy_bitmap(player);
     al_destroy_bitmap(avatarIntro);
     al_destroy_bitmap(avatar);
+    al_destroy_bitmap(treinador);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     al_destroy_display(display);
     destroyDialogue(&dialogue);
+    destroyDialogue(&cutscene2);
     return 0;
 }
